@@ -1,4 +1,301 @@
-<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="vi" class="h-full dark-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Hub Pro</title>
+    <link class="js-favicon" rel="icon" type="image/png" href="https://placehold.co/32x32/875cff/ffffff?text=TV">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--color-primary)',
+                        'primary-hover': 'var(--color-primary-hover)',
+                        'primary-light': 'var(--color-primary-light)',
+                        surface: 'var(--bg-surface)',
+                        variant: 'var(--bg-variant)',
+                        variantHover: 'var(--bg-variant-hover)',
+                        footer: 'var(--bg-footer)',
+                        main: 'var(--text-main)',
+                        muted: 'var(--text-muted)',
+                        borderColor: 'var(--border-color)',
+                        borderInput: 'var(--border-input)',
+                        dialogBg: 'var(--dialog-bg)',
+                        dialogFooter: 'var(--dialog-footer)',
+                        cardActive: 'var(--card-active)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome Icons & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- HLS.js for streaming M3U8 links -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    
+    <style>
+        :root.dark-theme {
+            --bg-base: #0a0a0c;
+            --bg-surface: #121215;
+            --bg-variant: #1a1a1e;
+            --bg-variant-hover: #232328;
+            --bg-footer: #0e0e11;
+            --text-main: #e3e2e6;
+            --text-muted: #8e8d91;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-input: rgba(255, 255, 255, 0.12);
+            --dialog-bg: #121215;
+            --dialog-footer: #0c0c0f;
+            --card-active: rgba(135, 92, 255, 0.15);
+            
+            /* Theme Colors */
+            --color-primary: #875cff;
+            --color-primary-hover: #9d7aff;
+            --color-primary-light: #d0bcff;
+            --color-primary-light-bg: rgba(208, 188, 255, 0.1);
+            --color-primary-focus-alpha: rgba(135, 92, 255, 0.25);
+        }
+        
+        :root.light-theme {
+            --bg-base: #f3f4f6;
+            --bg-surface: #ffffff;
+            --bg-variant: #e5e7eb;
+            --bg-variant-hover: #d1d5db;
+            --bg-footer: #f9fafb;
+            --text-main: #111827;
+            --text-muted: #4b5563; 
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-input: rgba(0, 0, 0, 0.15);
+            --dialog-bg: #ffffff;
+            --dialog-footer: #f9fafb;
+            --card-active: rgba(135, 92, 255, 0.1);
+            
+            /* High Contrast Colors */
+            --color-primary: #6d28d9;
+            --color-primary-hover: #5b21b6;
+            --color-primary-light: #6d28d9;
+            --color-primary-light-bg: rgba(109, 40, 217, 0.1);
+            --color-primary-focus-alpha: rgba(109, 40, 217, 0.15);
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        #sidebarSection {
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, padding 0.35s ease;
+        }
+        
+        #sidebarSection.hidden-sidebar {
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            padding: 0 !important;
+            opacity: 0;
+            pointer-events: none;
+            border-right-width: 0px !important;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-variant-hover);
+            border-radius: 9999px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        video {
+            object-fit: contain !important;
+            background-color: #000000;
+        }
+        
+        .multiview-grid {
+            display: grid;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+        
+        .multiview-box {
+            position: relative;
+            background: #000;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s ease;
+        }
+        
+        .grid-layout-1-3 {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            height: 100%;
+        }
+        
+        .grid-layout-1-3 .main-slot {
+            flex: 2;
+            position: relative;
+        }
+        
+        .grid-layout-1-3 .sub-slots {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        
+        .multiview-grid.multi-active .multiview-box {
+            border: 2px solid #1f1f23;
+        }
+        
+        .multiview-grid.multi-active .multiview-box.active-slot,
+        .grid-layout-1-3.multi-active .multiview-box.active-slot {
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 0 10px var(--color-primary-light-bg);
+        }
+        
+        .wave-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 50px;
+        }
+        
+        .wave-bar {
+            width: 5px;
+            height: 8px;
+            background-color: var(--color-primary);
+            border-radius: 3px;
+            animation: bounce-wave 0.8s ease-in-out infinite alternate;
+        }
+        
+        .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+        
+        @keyframes bounce-wave {
+            0% { height: 8px; }
+            100% { height: 50px; }
+        }
+        
+        body.cinema-mode-active header,
+        body.cinema-mode-active #sidebarSection,
+        body.cinema-mode-active #sidebarToggleBtn,
+        body.cinema-mode-active #controlBarInfo,
+        body.cinema-mode-active #epgCurrentBar,
+        body.cinema-mode-active #multiviewSettingsContainer {
+            display: none !important;
+        }
+        
+        body.cinema-mode-active main {
+            padding: 0 !important;
+            gap: 0 !important;
+            background-color: #000000 !important;
+        }
+        
+        body.cinema-mode-active .stage-container {
+            border-radius: 0 !important;
+            border: none !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background-color: #000000 !important;
+        }
+        
+        .seek-feedback {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            border-radius: 9999px;
+            padding: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 40;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0c] text-[#e3e2e6] h-full flex flex-col overflow-hidden antialiased">
+
+    <!-- Header App Bar -->
+    <header class="bg-surface border-b border-borderColor px-5 py-3 flex flex-col md:flex-row items-center justify-between shrink-0 gap-3 shadow-md z-20">
+        <div class="flex items-center justify-between w-full md:w-auto">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="bg-primary text-white p-2.5 rounded-2xl flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-tv text-md"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-sm font-extrabold tracking-tight text-main flex items-center gap-1.5">
+                        IPTV Hub 
+                        <span class="text-[9px] bg-primary/20 text-primary-light px-2.5 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1.5">
+                            ULTIMATE PRO
+                        </span>
+                        <button onclick="toggleAboutModal(true)" class="text-muted hover:text-primary transition p-0.5" title="Thông tin & Bản quyền">
+                            <i class="fa-solid fa-circle-info text-xs"></i>
+                        </button>
+                    </h1>
+                    <p class="text-[10px] text-muted truncate">Trình phát sóng truyền hình tối giản & mượt mà</p>
+                </div>
+            </div>
+            
+            <!-- Mobile settings trigger -->
+            <button onclick="toggleSettingsModal(true)" class="md:hidden bg-variant hover:bg-variantHover text-main p-2 rounded-full transition border border-borderColor flex items-center justify-center w-8 h-8">
+                <i class="fa-solid fa-gear text-xs"></i>
+            </button>
+        </div>
+        
+        <!-- Live Calendar (Solar & Lunar) - Hidden on Mobile -->
+        <div class="hidden md:flex items-center bg-variant/50 border border-borderColor rounded-2xl px-4 py-2 gap-3 text-xs w-full md:w-auto justify-center md:justify-start">
+            <div class="flex items-center gap-1.5 text-primary-light font-extrabold">
+                <i class="fa-regular fa-clock"></i>
+                <span id="txtLiveTime">00:00</span>
+            </div>
+            <div class="h-4 w-[1px] bg-borderColor"></div>
+            <div class="flex flex-col text-left">
+                <span id="txtSolarDate" class="text-main font-bold">Ngày 01 tháng 01 năm 2026</span>
+                <span id="txtLunarDate" class="text-muted text-[10px] font-medium">Âm lịch: Ngày 01/01</span>
+            </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-2 w-full md:w-auto justify-end">
+            <button onclick="toggleSettingsModal(true)" class="bg-variant hover:bg-variantHover text-main p-2.5 rounded-full transition border border-borderColor flex items-center justify-center w-10 h-10 shrink-0" title="Cài đặt hệ thống">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative p-3 gap-3">
+        
+        <!-- Sidebar: Playlists & Channels (Takes remaining vertical space on mobile) -->
+        <section id="sidebarSection" class="w-full md:w-80 lg:w-[320px] bg-surface rounded-2xl border border-borderColor flex flex-col shrink-0 flex-1 md:flex-none md:h-full overflow-hidden shadow-sm z-10 order-2 md:order-1">
+            
             <!-- Search & Filters -->
             <div class="p-3.5 space-y-3 border-b border-borderColor bg-surface shrink-0">
                 <!-- Dropdown selector -->
@@ -83,9 +380,174 @@
         </section>
 
         <!-- Toggle Collapse Side Bar -->
-<!-- ... existing code ... -->
-            <!-- Embedded Multiview Bar under playbar -->
-            <div id="multiviewSettingsContainer" class="bg-footer border-t border-borderColor px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5 z-10">
+        <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="hidden md:flex absolute left-[320px] top-[48%] -translate-y-1/2 z-30 w-5 h-10 bg-surface hover:bg-variantHover border border-borderColor text-main rounded-full items-center justify-center shadow-lg transition duration-200" style="margin-left: -10px;">
+            <i id="sidebarToggleIcon" class="fa-solid fa-chevron-left text-[10px]"></i>
+        </button>
+
+        <!-- Player Workspace (Takes aspect height on mobile) -->
+        <section class="w-full md:w-auto flex-none md:flex-1 flex flex-col bg-black md:bg-surface rounded-2xl border border-borderColor h-[30vh] md:h-full overflow-hidden shadow-sm relative stage-container z-0 order-1 md:order-2">
+            
+            <!-- Video Frame Container -->
+            <div class="flex-1 relative bg-black overflow-hidden">
+                <div id="multiviewGrid" class="multiview-grid grid-cols-1">
+                    
+                    <!-- Slot 0 -->
+                    <div id="mvSlot0" class="multiview-box active-slot" onclick="selectSlot(0)">
+                        <video id="videoPlayer0" class="w-full h-full object-contain" autoplay></video>
+                        <div id="audioVisualizer0" class="hidden absolute inset-0 bg-[#08080a] flex items-center justify-center z-10">
+                            <div class="wave-container">
+                                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                            </div>
+                        </div>
+                        <div id="seekLeftFeedback0" class="seek-feedback left-6"><i class="fa-solid fa-backward-fast text-white text-xl"></i></div>
+                        <div id="seekRightFeedback0" class="seek-feedback right-6"><i class="fa-solid fa-forward-fast text-white text-xl"></i></div>
+                    </div>
+                    
+                    <!-- Slot 1 -->
+                    <div id="mvSlot1" class="multiview-box hidden" onclick="selectSlot(1)">
+                        <video id="videoPlayer1" class="w-full h-full object-contain" autoplay></video>
+                        <div id="audioVisualizer1" class="hidden absolute inset-0 bg-[#08080a] flex items-center justify-center z-10">
+                            <div class="wave-container">
+                                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                            </div>
+                        </div>
+                        <div id="seekLeftFeedback1" class="seek-feedback left-6"><i class="fa-solid fa-backward-fast text-white text-xl"></i></div>
+                        <div id="seekRightFeedback1" class="seek-feedback right-6"><i class="fa-solid fa-forward-fast text-white text-xl"></i></div>
+                    </div>
+                    
+                    <!-- Slot 2 -->
+                    <div id="mvSlot2" class="multiview-box hidden" onclick="selectSlot(2)">
+                        <video id="videoPlayer2" class="w-full h-full object-contain" autoplay></video>
+                        <div id="audioVisualizer2" class="hidden absolute inset-0 bg-[#08080a] flex items-center justify-center z-10">
+                            <div class="wave-container">
+                                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                            </div>
+                        </div>
+                        <div id="seekLeftFeedback2" class="seek-feedback left-6"><i class="fa-solid fa-backward-fast text-white text-xl"></i></div>
+                        <div id="seekRightFeedback2" class="seek-feedback right-6"><i class="fa-solid fa-forward-fast text-white text-xl"></i></div>
+                    </div>
+                    
+                    <!-- Slot 3 -->
+                    <div id="mvSlot3" class="multiview-box hidden" onclick="selectSlot(3)">
+                        <video id="videoPlayer3" class="w-full h-full object-contain" autoplay></video>
+                        <div id="audioVisualizer3" class="hidden absolute inset-0 bg-[#08080a] flex items-center justify-center z-10">
+                            <div class="wave-container">
+                                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                            </div>
+                        </div>
+                        <div id="seekLeftFeedback3" class="seek-feedback left-6"><i class="fa-solid fa-backward-fast text-white text-xl"></i></div>
+                        <div id="seekRightFeedback3" class="seek-feedback right-6"><i class="fa-solid fa-forward-fast text-white text-xl"></i></div>
+                    </div>
+
+                </div>
+                
+                <!-- Placeholder Screen -->
+                <div id="playerPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-black/95 text-center p-5 z-10">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-3">
+                        <i class="fa-solid fa-clapperboard text-lg animate-pulse"></i>
+                    </div>
+                    <h3 class="text-xs font-extrabold text-white">Chưa Chọn Kênh Phát</h3>
+                    <p class="text-[10px] text-muted max-w-xs mt-1 leading-relaxed">Chọn kênh bất kỳ ở dưới để bắt đầu trình phát. <br>Thêm playlist mới trong mục Cài Đặt (bánh răng).</p>
+                </div>
+
+                <!-- Custom Overlay Playbar controls -->
+                <div id="customControls" class="absolute bottom-3 left-3 right-3 bg-black/75 backdrop-blur-md border border-borderColor rounded-xl p-2 flex flex-col gap-1.5 opacity-0 hover:opacity-100 transition-opacity duration-300 z-30">
+                    <!-- Progress for VOD -->
+                    <div id="vodProgressContainer" class="hidden flex items-center gap-2 px-1">
+                        <span id="vodCurrentTime" class="text-[9px] text-muted font-bold">00:00:00</span>
+                        <input type="range" id="vodProgressBar" oninput="seekVodMedia()" min="0" max="100" value="0" class="flex-1 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-primary">
+                        <span id="vodTotalDuration" class="text-[9px] text-muted font-bold">00:00:00</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button id="ctrlPlayBtn" onclick="togglePlayPause()" class="w-7 h-7 bg-primary hover:bg-primary-hover text-white rounded-full flex items-center justify-center transition">
+                                <i class="fa-solid fa-pause text-[9px]"></i>
+                            </button>
+                            <div class="flex items-center gap-1">
+                                <button id="ctrlMuteBtn" onclick="toggleMute()" class="text-white hover:text-primary p-1 text-xs">
+                                    <i class="fa-solid fa-volume-high text-[9px]"></i>
+                                </button>
+                                <input type="range" id="ctrlVolumeSlider" oninput="onVolumeSliderChange()" min="0" max="1" step="0.1" value="1" class="w-12 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-primary">
+                            </div>
+                            <button onclick="retryPlayback()" class="text-muted hover:text-white p-1 text-xs" title="Tải lại luồng">
+                                <i class="fa-solid fa-rotate-right text-[10px]"></i>
+                            </button>
+                            <div class="hidden sm:flex items-center gap-1.5 text-[8px] bg-variant/60 rounded-full px-2 py-0.5 text-muted font-semibold">
+                                <div id="liveStatusDot" class="w-1 h-1 rounded-full bg-green-500"></div>
+                                <span id="liveStatusText" class="text-green-400">TRỰC TIẾP</span>
+                                <span id="controlDuration"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <button id="ctrlCinemaBtn" onclick="toggleCinemaMode()" class="bg-variant hover:bg-variantHover text-main p-1 rounded-lg text-xs transition" title="Rạp phim">
+                                <i class="fa-solid fa-lightbulb text-[9px]"></i>
+                            </button>
+                            <button onclick="togglePip()" class="bg-variant hover:bg-variantHover text-main p-1 rounded-lg text-xs transition" title="Ảnh trong ảnh">
+                                <i class="fa-solid fa-clone text-[9px]"></i>
+                            </button>
+                            <button onclick="toggleFullscreen()" class="bg-variant hover:bg-variantHover text-main p-1 rounded-lg text-xs transition" title="Toàn màn hình">
+                                <i class="fa-solid fa-expand text-[9px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HUD Info popup -->
+                <div id="channelHud" class="absolute bottom-5 left-5 right-5 bg-[#121215]/80 backdrop-blur-md border border-primary/25 rounded-2xl p-3 flex items-center justify-between gap-4 z-20 opacity-0 translate-y-6 pointer-events-none transition-all duration-300">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <img id="hudLogo" src="" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant p-1 shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <h4 id="hudChannelName" class="font-extrabold text-white text-xs truncate">Tên kênh</h4>
+                            <div class="flex items-center gap-2 mt-0.5 min-w-0">
+                                <span class="text-[8px] bg-primary text-white font-extrabold px-1.5 py-0.5 rounded-full">ĐANG PHÁT</span>
+                                <span id="hudProgramTitle" class="text-[10px] text-primary-light font-bold truncate">Lịch chiếu...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span id="hudProgramTime" class="text-[9px] text-muted font-bold block">00:00 - 00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EPG current bar (Hidden on mobile) -->
+            <div id="epgCurrentBar" class="hidden md:flex bg-variant border-t border-borderColor px-4 py-2 text-xs flex items-center justify-between gap-4 shrink-0">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="bg-primary text-white font-extrabold px-1.5 py-0.5 rounded text-[8px]">ĐANG CHIẾU</span>
+                    <span id="epgCurrentTitle" class="text-main font-bold truncate">Đang tải lịch phát sóng...</span>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <span id="epgCurrentTime" class="text-muted font-semibold">00:00 - 00:00</span>
+                </div>
+            </div>
+
+            <!-- Footer control bar and info (Hidden on mobile) -->
+            <div id="controlBarInfo" class="hidden md:flex bg-surface border-t border-borderColor p-3 shrink-0 flex-col lg:flex-row lg:items-center lg:justify-between gap-3 z-10">
+                <div class="flex items-center gap-3 min-w-0">
+                    <img id="currentLogo" src="https://placehold.co/80x80/252529/d0bcff?text=TV" onerror="this.src='https://placehold.co/80x80/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant border border-borderInput p-1 shrink-0" alt="Logo">
+                    <div class="min-w-0">
+                        <h2 id="currentTitle" class="font-bold text-main text-sm truncate">Chưa chọn kênh phát</h2>
+                        <p id="currentGroup" class="text-[10px] text-muted mt-0.5">Chọn một kênh bên trái để bắt đầu</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button id="showEpgTimelineBtn" onclick="toggleEpgTimeline()" class="bg-variant hover:bg-variantHover text-main px-3.5 py-2 border border-borderInput rounded-full transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-list-ul text-[10px] text-primary"></i> <span class="text-[11px] font-bold">Lịch chiếu</span>
+                    </button>
+                    <button id="favoriteBtn" onclick="toggleCurrentFavorite()" class="bg-variant hover:bg-variantHover text-muted p-2 rounded-full transition border border-borderInput w-9 h-9 flex items-center justify-center" title="Yêu thích">
+                        <i class="fa-solid fa-star text-xs"></i>
+                    </button>
+                    <button onclick="retryPlayback()" class="bg-variant hover:bg-variantHover text-main p-2 rounded-full transition border border-borderInput w-9 h-9 flex items-center justify-center" title="Tải lại luồng">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Embedded Multiview Bar under playbar (Hidden on mobile) -->
+            <div id="multiviewSettingsContainer" class="hidden md:flex bg-footer border-t border-borderColor px-4 py-2.5 flex-wrap items-center justify-between gap-2.5 z-10 shrink-0">
                 <div class="flex items-center gap-1.5">
                     <span class="text-[9px] font-extrabold text-muted uppercase tracking-wider mr-1">Đa Màn Hình:</span>
                     <button id="primaryMvBtn_1" onclick="selectPrimaryMultiView('1')" class="px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white">1 Màn</button>
@@ -111,14 +573,225 @@
     </main>
 
     <!-- Modal: Settings dialog -->
-<!-- ... existing code ... -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
+                <h3 class="text-xs font-extrabold text-main tracking-wider uppercase flex items-center gap-1.5">
+                    <i class="fa-solid fa-sliders text-primary"></i> Cài Đặt Hệ Thống
+                </h3>
+                <button onclick="toggleSettingsModal(false)" class="text-muted hover:text-main transition w-7 h-7 rounded-full hover:bg-variant flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 space-y-4 max-h-[65vh] overflow-y-auto">
+                <!-- Theme styling -->
+                <div class="space-y-2.5">
+                    <h4 class="text-[10px] font-extrabold text-primary uppercase tracking-wider">Giao Diện & Màu Sắc</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="applyUiTheme('dark')" class="p-2.5 bg-variant hover:bg-variantHover rounded-xl border border-borderInput text-xs font-bold text-main flex flex-col items-center gap-1 transition">
+                            <i class="fa-solid fa-moon text-sm"></i> Nền Tối
+                        </button>
+                        <button onclick="applyUiTheme('light')" class="p-2.5 bg-variant hover:bg-variantHover rounded-xl border border-borderInput text-xs font-bold text-main flex flex-col items-center gap-1 transition">
+                            <i class="fa-solid fa-sun text-sm"></i> Nền Sáng
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-1 pt-1.5">
+                        <label class="block text-[9px] text-muted font-extrabold uppercase tracking-widest px-1">Tông màu chủ đạo</label>
+                        <div class="flex items-center gap-2">
+                            <button onclick="applyColorTheme('purple')" class="w-6 h-6 rounded-full bg-[#875cff] border-2 border-transparent hover:scale-110 transition" title="Tím"></button>
+                            <button onclick="applyColorTheme('blue')" class="w-6 h-6 rounded-full bg-[#1e40af] border-2 border-transparent hover:scale-110 transition" title="Xanh dương"></button>
+                            <button onclick="applyColorTheme('green')" class="w-6 h-6 rounded-full bg-[#065f46] border-2 border-transparent hover:scale-110 transition" title="Xanh lá"></button>
+                            <button onclick="applyColorTheme('rose')" class="w-6 h-6 rounded-full bg-[#9f1239] border-2 border-transparent hover:scale-110 transition" title="Đỏ hồng"></button>
+                            <button onclick="applyColorTheme('amber')" class="w-6 h-6 rounded-full bg-[#92400e] border-2 border-transparent hover:scale-110 transition" title="Hổ phách"></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="h-[1px] bg-borderColor/40"></div>
+
+                <div class="space-y-2">
+                    <h4 class="text-[10px] font-extrabold text-primary uppercase tracking-wider">Nạp Playlist & EPG</h4>
+                    <p class="text-[11px] text-muted">Nhập danh sách tivi và thiết lập lịch phát sóng.</p>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="openPlaylistSetup()" class="p-3 bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-xl text-xs font-bold text-primary flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-folder-plus text-sm"></i> Thêm Playlist
+                        </button>
+                        <button onclick="openEpgSetup()" class="p-3 bg-variant hover:bg-variantHover border border-borderColor rounded-xl text-xs font-bold text-main flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-calendar-plus text-sm"></i> Đồng Bộ EPG
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-3.5 bg-dialogFooter border-t border-borderColor/50 flex items-center justify-between">
+                <span class="text-[8px] font-extrabold tracking-wider text-muted"> DEVELOPED BY <span class="text-primary">GEMINI<br>Một sản phẩm vibe coding</br> </span></span>
+                <button onclick="toggleSettingsModal(false)" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-full transition shadow-md">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Playlist -->
+    <div id="playlistModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
+                <h3 class="text-xs font-extrabold tracking-wide text-main uppercase">Thêm Playlist IPTV</h3>
+                <button onclick="togglePlaylistModal(false)" class="text-muted hover:text-main transition w-7 h-7 rounded-full hover:bg-variant flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-main mb-1.5">Tên Gợi Nhớ</label>
+                    <input type="text" id="playlistName" placeholder="Tivi gia đình..." class="w-full bg-variant border border-borderColor rounded-xl px-3 py-2 text-xs text-main placeholder-muted focus:outline-none focus:border-primary">
+                </div>
+
+                <div>
+                    <div class="flex border-b border-borderColor mb-3">
+                        <button onclick="switchTab('url')" id="tab-url" class="flex-1 py-1.5 text-xs font-bold text-primary border-b-2 border-primary focus:outline-none transition">EPG Link / URL</button>
+                        <button onclick="switchTab('file')" id="tab-file" class="flex-1 py-1.5 text-xs font-bold text-muted border-b-2 border-transparent focus:outline-none transition">Tải tệp (.m3u)</button>
+                    </div>
+
+                    <div id="panel-url" class="space-y-1.5">
+                        <label class="block text-[10px] text-muted px-1">Đường dẫn tệp M3U trực tuyến</label>
+                        <input type="url" id="playlistUrl" placeholder="https://example.com/channels.m3u" class="w-full bg-variant border border-borderColor rounded-xl px-3 py-2.5 text-xs text-main placeholder-muted focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div id="panel-file" class="hidden space-y-1.5">
+                        <label class="block text-[10px] text-muted px-1">Chọn tệp .m3u từ máy của bạn</label>
+                        <input type="file" id="playlistFileInput" accept=".m3u,.m3u8,.txt" class="w-full bg-variant border border-borderColor rounded-xl px-3 py-2 text-xs text-main file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-primary file:text-white file:cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 bg-dialogFooter border-t border-borderColor/50 flex justify-end gap-2">
+                <button onclick="togglePlaylistModal(false)" class="px-4 py-2 hover:bg-variant text-primary text-xs font-bold rounded-full transition">Hủy</button>
+                <button onclick="savePlaylist()" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-full transition shadow-md">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: EPG Settings -->
+    <div id="epgModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
+                <h3 class="text-xs font-extrabold text-main uppercase">Đồng Bộ Lịch EPG</h3>
+                <button onclick="toggleEpgModal(false)" class="text-muted hover:text-main transition w-7 h-7 rounded-full hover:bg-variant flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 space-y-4">
+                <p class="text-[11px] text-muted leading-relaxed">Chọn đường dẫn XMLTV (.xml) để cập nhật lịch trình các kênh tivi đang chiếu.</p>
+                
+                <div>
+                    <div class="flex border-b border-borderColor mb-3">
+                        <button onclick="switchEpgTab('url')" id="tab-epg-url" class="flex-1 py-1.5 text-xs font-bold text-primary border-b-2 border-primary focus:outline-none transition">URL Link</button>
+                        <button onclick="switchEpgTab('file')" id="tab-epg-file" class="flex-1 py-1.5 text-xs font-bold text-muted border-b-2 border-transparent focus:outline-none transition">Tải file XML</button>
+                        <button onclick="switchEpgTab('text')" id="tab-epg-text" class="flex-1 py-1.5 text-xs font-bold text-muted border-b-2 border-transparent focus:outline-none transition">Dán thô</button>
+                    </div>
+
+                    <div id="panel-epg-url" class="space-y-1.5">
+                        <label class="block text-[10px] text-muted">Đường dẫn tệp XMLTV</label>
+                        <input type="url" id="epgUrl" placeholder="Ví dụ: http://epg.535-kun.com/vietnam.xml" class="w-full bg-variant border border-borderColor rounded-xl px-3 py-2 text-xs text-main placeholder-muted focus:outline-none focus:border-primary">
+                    </div>
+
+                    <div id="panel-epg-file" class="hidden space-y-1.5">
+                        <label class="block text-[10px] text-muted">Chọn tệp XML từ máy</label>
+                        <input type="file" id="epgFileInput" accept=".xml,.xmltv" class="w-full bg-variant border border-borderColor rounded-xl px-3 py-2 text-xs text-main file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-primary file:text-white file:cursor-pointer">
+                    </div>
+
+                    <div id="panel-epg-text" class="hidden space-y-1.5">
+                        <label class="block text-[10px] text-muted">Dán dữ liệu XML thô trực tiếp</label>
+                        <textarea id="epgTextPaste" rows="3" placeholder="<tv>...</tv>" class="w-full bg-variant border border-borderColor rounded-xl px-3 py-2 text-xs text-main font-mono placeholder-muted focus:outline-none focus:border-primary"></textarea>
+                    </div>
+                </div>
+
+                <div id="epgStatusDetails" class="bg-variant rounded-xl p-3 border border-borderColor text-xs text-muted space-y-1.5">
+                    <div class="flex justify-between"><span>Nguồn EPG:</span> <span id="lblEpgSource" class="text-primary-light font-bold truncate max-w-[150px]">Chưa cài đặt</span></div>
+                    <div class="flex justify-between"><span>Đồng bộ cuối:</span> <span id="lblEpgLastUpdate" class="text-main">Chưa rõ</span></div>
+                    <div class="flex justify-between"><span>Kênh liên kết:</span> <span id="lblEpgChannelsCount" class="text-green-400 font-extrabold bg-green-400/10 px-1.5 py-0.5 rounded-full text-[9px]">0</span></div>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 bg-dialogFooter border-t border-borderColor/50 flex justify-between gap-2">
+                <button onclick="deleteEpgData()" class="px-3.5 py-2 bg-red-950/20 text-red-400 border border-red-900/10 text-xs font-bold rounded-full transition">Xóa lịch</button>
+                <div class="flex gap-1.5">
+                    <button onclick="toggleEpgModal(false)" class="px-4 py-2 hover:bg-variant text-primary text-xs font-bold rounded-full transition">Quay lại</button>
+                    <button onclick="saveEpgSource()" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-full transition shadow-md">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: About & Disclaimer (Giới thiệu & Tuyên bố bản quyền) -->
+    <div id="aboutModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+            <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
+                <h3 class="text-xs font-extrabold tracking-wide text-main uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-primary"></i> Giới Thiệu & Bản Quyền
+                </h3>
+                <button onclick="toggleAboutModal(false)" class="text-muted hover:text-main transition w-7 h-7 rounded-full hover:bg-variant flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 space-y-4 text-xs leading-relaxed text-muted">
+                <div class="space-y-1">
+                    <h4 class="font-extrabold text-main text-sm flex items-center gap-1.5">
+                        IPTV Hub <span class="text-[9px] bg-primary/20 text-primary-light px-2 py-0.5 rounded font-extrabold">v2.6 PRO</span>
+                    </h4>
+                    <p>Hệ thống trình phát IPTV cá nhân siêu nhẹ, được phát triển trên phong cách glassmorphism tối giản và tập trung cao vào hiệu năng xử lý danh sách kênh lớn.</p>
+                </div>
+                
+                <div class="border-t border-borderColor/50 pt-3 space-y-2">
+                    <h4 class="font-extrabold text-primary uppercase text-[10px] tracking-wider">Tuyên bố miễn trừ trách nhiệm</h4>
+                    <p class="text-main bg-variant/40 p-3 rounded-xl border border-borderColor/50 leading-relaxed">
+                        Phần mềm này <strong>chỉ cung cấp giải pháp giao diện hiển thị, trình phát đa phương tiện và công cụ quản trị sắp xếp</strong> danh mục tivi cá nhân. Chúng tôi hoàn toàn <strong>không sở hữu, không lưu trữ và không cung cấp sẵn</strong> bất kỳ đường link luồng phát, kênh truyền hình hay nội dung phát sóng thương mại nào. Người dùng tự hoàn toàn chịu trách nhiệm pháp lý đối với nguồn cung cấp và nội dung của playlist (M3U) do mình tự tải lên hoặc liên kết từ bên thứ ba.
+                    </p>
+                </div>
+
+                <div class="border-t border-borderColor/50 pt-3 flex justify-between items-center text-[10px] text-muted">
+                    <span>Phát triển: <strong class="text-main">Trung & Gemini</strong></span>
+                    <span class="text-primary-light font-extrabold">IPTV Hub Team © 2026</span>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 bg-dialogFooter border-t border-borderColor/50 flex justify-end">
+                <button onclick="toggleAboutModal(false)" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-full transition shadow-md">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Confirmation Prompt -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-xs shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="p-5 space-y-2">
+                <h3 id="confirmTitle" class="text-xs font-extrabold text-main uppercase">Tiêu đề</h3>
+                <p id="confirmMessage" class="text-xs text-muted leading-relaxed">Nội dung...</p>
+            </div>
+            <div class="px-5 py-3 bg-dialogFooter border-t border-borderColor/50 flex justify-end gap-1.5">
+                <button onclick="closeConfirm(false)" class="px-3.5 py-1.5 hover:bg-variant text-primary text-xs font-bold rounded-full transition">Hủy</button>
+                <button id="confirmOkBtn" onclick="closeConfirm(true)" class="px-3.5 py-1.5 bg-primary text-white text-xs font-bold rounded-full transition shadow-md">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="hidden fixed bottom-6 right-6 bg-variant border border-borderColor text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300">
+        <i id="toastIcon" class="fa-solid fa-info-circle text-primary text-sm"></i>
+        <span id="toastMessage" class="text-xs font-bold leading-relaxed">Thông báo</span>
+    </div>
+
     <!-- KHỐI MÃ JAVASCRIPT HỢP NHẤT TOÀN DIỆN (PREVENTS "db is not defined" ERRORS) -->
     <script>
         // --- 1. KHAI BÁO BIẾN TRẠNG THÁI TOÀN CỤC ---
         const DB_NAME = "IPTV_Hub_DB_V2";
         const DB_VERSION = 2;
         let db = null; // Khởi tạo DB mặc định là null để kiểm tra trạng thái an toàn
-        let isLocalStorageFallback = false; // Cờ lưu trữ dự phòng
+        let isLocalStorageFallback = false; // Cờ lưu trữ dự phòng khi chạy trên sandbox iframe bị chặn
 
         let playlists = [];
         let currentPlaylistId = "";
@@ -156,7 +829,1150 @@
         let confirmResolve = null;
 
         // --- 2. HỆ THỐNG ĐIỀU KHIỂN & TIỆN ÍCH BAN ĐẦU ---
-<!-- ... existing code ... -->
+        function safePlay(video) {
+            if (!video) return;
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.warn("Trình phát đã chặn hoặc gặp sự cố tải luồng:", error);
+                });
+            }
+        }
+
+        function showConfirm(title, message, isDangerous = false) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById("confirmModal");
+                document.getElementById("confirmTitle").textContent = title;
+                document.getElementById("confirmMessage").textContent = message;
+                const okBtn = document.getElementById("confirmOkBtn");
+                if (isDangerous) {
+                    okBtn.className = "px-4 py-2 bg-red-900 text-red-100 text-xs font-bold rounded-full transition hover:bg-red-800";
+                } else {
+                    okBtn.className = "px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-full transition hover:bg-indigo-700 shadow-md";
+                }
+                modal.classList.remove("hidden");
+                confirmResolve = resolve;
+            });
+        }
+
+        function closeConfirm(result) {
+            document.getElementById("confirmModal").classList.add("hidden");
+            if (confirmResolve) {
+                confirmResolve(result);
+                confirmResolve = null;
+            }
+        }
+
+        function showToast(message, type = "info") {
+            const toast = document.getElementById("toast");
+            const icon = document.getElementById("toastIcon");
+            const msg = document.getElementById("toastMessage");
+
+            if (!toast || !msg) return;
+
+            msg.textContent = message;
+            
+            if (type === "success") {
+                if (icon) icon.className = "fa-solid fa-circle-check text-green-400 text-sm";
+                toast.className = "fixed bottom-6 right-6 bg-variant border border-green-400/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300";
+            } else if (type === "error") {
+                if (icon) icon.className = "fa-solid fa-circle-exclamation text-red-400 text-sm";
+                toast.className = "fixed bottom-6 right-6 bg-variant border border-red-500/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300";
+            } else {
+                if (icon) icon.className = "fa-solid fa-circle-info text-primary text-sm";
+                toast.className = "fixed bottom-6 right-6 bg-variant border border-primary/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300";
+            }
+
+            toast.classList.remove("hidden");
+            setTimeout(() => { toast.classList.add("hidden"); }, 3000);
+        }
+
+        function updateLiveCalendarAndClock() {
+            const now = new Date();
+            const hour = String(now.getHours()).padStart(2, '0');
+            const minute = String(now.getMinutes()).padStart(2, '0');
+            const liveTimeEl = document.getElementById("txtLiveTime");
+            if (liveTimeEl) liveTimeEl.textContent = `${hour}:${minute}`;
+
+            const day = now.getDate();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear();
+            const solarDateEl = document.getElementById("txtSolarDate");
+            if (solarDateEl) solarDateEl.textContent = `Ngày ${day} tháng ${month} năm ${year}`;
+
+            const lunarDay = day; 
+            const lunarMonth = month;
+            const can = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
+            const chi = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+            const lunarYearName = `${can[(year - 4) % 10]} ${chi[(year - 4) % 12]}`;
+
+            const lunarDateEl = document.getElementById("txtLunarDate");
+            if (lunarDateEl) lunarDateEl.textContent = `Âm lịch: Ngày ${lunarDay}/${lunarMonth} (Năm ${lunarYearName})`;
+        }
+
+        // --- 3. KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB VỚI FALLBACK LOCALSTORAGE ---
+        function initDB() {
+            return new Promise((resolve) => {
+                try {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    request.onupgradeneeded = (e) => {
+                        const database = e.target.result;
+                        if (!database.objectStoreNames.contains("playlists")) {
+                            database.createObjectStore("playlists", { keyPath: "id" });
+                        }
+                        if (!database.objectStoreNames.contains("epg")) {
+                            database.createObjectStore("epg", { keyPath: "channelId" });
+                        }
+                    };
+                    request.onsuccess = (e) => {
+                        db = e.target.result; 
+                        isLocalStorageFallback = false;
+                        resolve(db);
+                    };
+                    request.onerror = (e) => {
+                        console.warn("IndexedDB blocked/denied in iframe sandbox. Using LocalStorage fallback.");
+                        isLocalStorageFallback = true;
+                        resolve(null);
+                    };
+                } catch (err) {
+                    console.warn("IndexedDB API not available. Using LocalStorage fallback.", err);
+                    isLocalStorageFallback = true;
+                    resolve(null);
+                }
+            });
+        }
+
+        // --- 4. TIẾN TRÌNH TRUY XUẤT CƠ SỞ DỮ LIỆU KÉP ---
+        async function loadPlaylistsFromDB() {
+            return new Promise((resolve) => {
+                if (isLocalStorageFallback) {
+                    const localData = localStorage.getItem("fallback_playlists");
+                    playlists = localData ? JSON.parse(localData) : [];
+                    updatePlaylistDropdown();
+                    triggerAutoLoadLastPlaylist();
+                    resolve();
+                } else {
+                    if (!db) { resolve(); return; }
+                    const transaction = db.transaction("playlists", "readonly");
+                    const store = transaction.objectStore("playlists");
+                    const request = store.getAll();
+                    request.onsuccess = () => {
+                        playlists = request.result || [];
+                        updatePlaylistDropdown();
+                        triggerAutoLoadLastPlaylist();
+                        resolve();
+                    };
+                    request.onerror = () => {
+                        isLocalStorageFallback = true;
+                        loadPlaylistsFromDB().then(resolve);
+                    };
+                }
+            });
+        }
+
+        function triggerAutoLoadLastPlaylist() {
+            const lastId = localStorage.getItem("iptv_last_playlist_id");
+            if (lastId && playlists.some(p => p.id === lastId)) {
+                document.getElementById("playlistSelect").value = lastId;
+                onPlaylistChange();
+            } else if (playlists.length > 0) {
+                document.getElementById("playlistSelect").value = playlists[0].id;
+                onPlaylistChange();
+            }
+        }
+
+        function updatePlaylistDropdown() {
+            const select = document.getElementById("playlistSelect");
+            select.innerHTML = "";
+            if (playlists.length === 0) {
+                const option = document.createElement("option");
+                option.value = "";
+                option.textContent = "-- Chưa có playlist --";
+                select.appendChild(option);
+                return;
+            }
+            playlists.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p.id;
+                option.textContent = `${p.name} (${p.channels.length} kênh)`;
+                select.appendChild(option);
+            });
+        }
+
+        function savePlaylistToDB(playlist) {
+            return new Promise((resolve, reject) => {
+                if (isLocalStorageFallback) {
+                    const idx = playlists.findIndex(p => p.id === playlist.id);
+                    if (idx !== -1) playlists[idx] = playlist;
+                    else playlists.push(playlist);
+                    localStorage.setItem("fallback_playlists", JSON.stringify(playlists));
+                    resolve();
+                } else {
+                    if (!db) { reject(new Error("Database not ready")); return; }
+                    const transaction = db.transaction("playlists", "readwrite");
+                    const store = transaction.objectStore("playlists");
+                    const request = store.put(playlist);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                }
+            });
+        }
+
+        function deletePlaylistFromDB(id) {
+            return new Promise((resolve, reject) => {
+                if (isLocalStorageFallback) {
+                    playlists = playlists.filter(p => p.id !== id);
+                    localStorage.setItem("fallback_playlists", JSON.stringify(playlists));
+                    resolve();
+                } else {
+                    if (!db) { reject(new Error("Database not ready")); return; }
+                    const transaction = db.transaction("playlists", "readwrite");
+                    const store = transaction.objectStore("playlists");
+                    const request = store.delete(id);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                }
+            });
+        }
+
+        // --- 5. ĐỒNG BỘ PLAYLISTS ---
+        async function savePlaylist() {
+            const nameInput = document.getElementById("playlistName").value.trim();
+            const playlistName = nameInput || `Danh sách ngày ${new Date().toLocaleDateString()}`;
+
+            if (activeTab === 'url') {
+                const url = document.getElementById("playlistUrl").value.trim();
+                if (!url) {
+                    showToast("Vui lòng nhập đường dẫn URL!", "error");
+                    return;
+                }
+                showToast("Đang tải danh sách kênh...", "info");
+                try {
+                    const text = await fetchWithFallbackProxies(url);
+                    await processAndSavePlaylistContent(playlistName, text, url);
+                } catch (err) {
+                    showToast(err.message, "error");
+                }
+            } else {
+                const fileInput = document.getElementById("playlistFileInput");
+                if (fileInput.files.length === 0) {
+                    showToast("Vui lòng chọn một tệp danh sách!", "error");
+                    return;
+                }
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    await processAndSavePlaylistContent(playlistName, e.target.result, `local_file_${Date.now()}`);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        async function processAndSavePlaylistContent(name, content, id) {
+            try {
+                let channels = parseM3U(content);
+                if (channels.length === 0) {
+                    showToast("Tệp không chứa bất kỳ danh sách kênh hợp lệ nào!", "error");
+                    return;
+                }
+                const playlist = { id, name, channels, addedAt: Date.now() };
+                await savePlaylistToDB(playlist);
+                await loadPlaylistsFromDB();
+                document.getElementById("playlistSelect").value = id;
+                onPlaylistChange();
+                togglePlaylistModal(false);
+                showToast(`Đã nạp ${channels.length} kênh thành công!`, "success");
+
+                // Auto EPG Extraction
+                const epgUrlMatch = content.match(/x-tvg-url="([^"]+)"/i) || content.match(/url-tvg="([^"]+)"/i);
+                if (epgUrlMatch && epgUrlMatch[1]) {
+                    const epgUrl = epgUrlMatch[1].trim();
+                    showToast("Phát hiện link EPG đi kèm. Đang tự động nạp...", "info");
+                    setTimeout(() => { autoSyncEpgFromUrl(epgUrl); }, 1000);
+                }
+            } catch (err) {
+                showToast(err.message, "error");
+            }
+        }
+
+        async function autoSyncEpgFromUrl(epgUrl) {
+            try {
+                const xmlText = await fetchWithFallbackProxies(epgUrl);
+                await processAndSaveEPG(xmlText, epgUrl);
+            } catch (err) {
+                console.warn("Lỗi tải EPG tự động:", err);
+            }
+        }
+
+        async function deleteCurrentPlaylist() {
+            if (!currentPlaylistId) return;
+            const confirmed = await showConfirm("Xóa Playlist?", "Danh sách tivi này sẽ bị xóa bỏ.");
+            if (confirmed) {
+                await deletePlaylistFromDB(currentPlaylistId);
+                localStorage.removeItem("iptv_last_playlist_id");
+                await loadPlaylistsFromDB();
+                onPlaylistChange();
+                showToast("Đã xóa tivi.", "success");
+            }
+        }
+
+        async function updateCurrentPlaylist() {
+            if (!currentPlaylistId) return;
+            if (currentPlaylistId.startsWith("local_file_")) {
+                showToast("Không thể cập nhật danh sách local thô.", "error");
+                return;
+            }
+            const activePlaylist = playlists.find(p => p.id === currentPlaylistId);
+            if (!activePlaylist) return;
+
+            showToast(`Đang đồng bộ lại: ${activePlaylist.name}...`, "info");
+            try {
+                const text = await fetchWithFallbackProxies(currentPlaylistId);
+                await processAndSavePlaylistContent(activePlaylist.name, text, currentPlaylistId);
+            } catch (err) {
+                showToast(`Lỗi: ${err.message}`, "error");
+            }
+        }
+
+        function onPlaylistChange() {
+            const select = document.getElementById("playlistSelect");
+            currentPlaylistId = select.value;
+            const updateBtn = document.getElementById("updatePlaylistBtn");
+            const deleteBtn = document.getElementById("deletePlaylistBtn");
+            
+            if (!currentPlaylistId) {
+                currentChannels = [];
+                renderChannels();
+                updateBtn.classList.add("opacity-40", "cursor-not-allowed");
+                deleteBtn.classList.add("opacity-40", "cursor-not-allowed");
+                return;
+            } else {
+                deleteBtn.classList.remove("opacity-40", "cursor-not-allowed");
+                if (currentPlaylistId.startsWith("local_file_")) {
+                    updateBtn.classList.add("opacity-40", "cursor-not-allowed");
+                } else {
+                    updateBtn.classList.remove("opacity-40", "cursor-not-allowed");
+                }
+            }
+            localStorage.setItem("iptv_last_playlist_id", currentPlaylistId);
+            const activePlaylist = playlists.find(p => p.id === currentPlaylistId);
+            if (activePlaylist) {
+                currentChannels = activePlaylist.channels;
+                populateGroups();
+                renderChannels();
+            }
+        }
+
+        // --- 6. PHÂN TÍCH TỆP M3U & PROXIES NẠP DỮ LIỆU ---
+        async function fetchWithFallbackProxies(url) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) return await response.text();
+            } catch (e) {
+                console.warn("Direct fetch blocked by CORS. Switching to Proxy 1...");
+            }
+            try {
+                const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+                if (response.ok) return await response.text();
+            } catch (e) {
+                console.warn("Proxy 1 blocked. Switching to Proxy 2...");
+            }
+            try {
+                const response = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`);
+                if (response.ok) return await response.text();
+            } catch (e) {
+                console.error("All proxies failed.");
+            }
+            throw new Error("Không thể nạp dữ liệu. Bạn có thể dán link trực tiếp hoặc tải tệp lên máy.");
+        }
+
+        function parseM3U(m3uContent) {
+            if (!m3uContent) return [];
+            const cleanContent = m3uContent.trim();
+            if (cleanContent.toLowerCase().startsWith("<!doc") || cleanContent.toLowerCase().startsWith("<html")) {
+                throw new Error("Dữ liệu không đúng định dạng M3U.");
+            }
+
+            const lines = m3uContent.split(/\r?\n/);
+            const channels = [];
+            let currentChan = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (!line) continue;
+
+                if (line.startsWith("#EXTM3U")) continue;
+
+                if (line.startsWith("#EXTINF:")) {
+                    currentChan = {};
+                    const idMatch = line.match(/tvg-id="([^"]+)"/i);
+                    if (idMatch) currentChan.tvgId = idMatch[1];
+                    const logoMatch = line.match(/tvg-logo="([^"]+)"/i);
+                    if (logoMatch) currentChan.logo = logoMatch[1];
+                    const groupMatch = line.match(/group-title="([^"]+)"/i);
+                    currentChan.group = groupMatch ? groupMatch[1] : "Kênh khác";
+                    const commaIdx = line.lastIndexOf(",");
+                    currentChan.name = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : "Kênh không tên";
+                } else if (!line.startsWith("#")) {
+                    if (line.match(/^(https?|rtmp|rtsp|mms|file):/i) || line.includes("://")) {
+                        if (!currentChan) {
+                            currentChan = {
+                                name: line.substring(line.lastIndexOf('/') + 1) || "Luồng thô",
+                                group: "Kênh thô"
+                            };
+                        }
+                        currentChan.url = line;
+                        channels.push(currentChan);
+                        currentChan = null;
+                    }
+                }
+            }
+            return channels;
+        }
+
+        function populateGroups() {
+            const groupSelect = document.getElementById("groupSelect");
+            const groups = new Set();
+            currentChannels.forEach(c => {
+                if (c.group) groups.add(c.group);
+            });
+            groupSelect.innerHTML = '<option value="all">Tất cả các nhóm</option>';
+            Array.from(groups).sort().forEach(g => {
+                const option = document.createElement("option");
+                option.value = g;
+                option.textContent = g;
+                groupSelect.appendChild(option);
+            });
+        }
+
+        // --- 7. QUẢN LÝ DANH MỤC & PHƯƠNG THỨC BIÊN TẬP KÊNH ---
+        function toggleEditMode() {
+            editMode = !editMode;
+            const btn = document.getElementById("editModeBtn");
+            const panel = document.getElementById("editControlsPanel");
+            if (editMode) {
+                btn.classList.add("bg-primary/10", "text-primary-light", "border-primary/40");
+                panel.classList.remove("hidden");
+                panel.classList.add("flex");
+                showToast("Bật chế độ sửa đổi.", "info");
+            } else {
+                btn.classList.remove("bg-primary/10", "text-primary-light", "border-primary/40");
+                panel.classList.add("hidden");
+                panel.classList.remove("flex");
+            }
+            renderChannels();
+        }
+
+        function toggleShowHidden() {
+            showHidden = !showHidden;
+            const btn = document.getElementById("showHiddenBtn");
+            btn.textContent = showHidden ? "Hiện kênh ẩn: Bật" : "Hiện kênh ẩn: Tắt";
+            renderChannels();
+        }
+
+        function hideChannel(key) {
+            if (hiddenChannels[key]) {
+                delete hiddenChannels[key];
+                showToast("Đã hiện lại.", "success");
+            } else {
+                hiddenChannels[key] = true;
+                showToast("Đã ẩn.", "success");
+            }
+            localStorage.setItem("iptv_hidden_channels", JSON.stringify(hiddenChannels));
+            renderChannels();
+        }
+
+        async function deleteChannel(key) {
+            const confirmed = await showConfirm("Xóa kênh?", "Kênh này sẽ biến mất khỏi tivi phát.");
+            if (confirmed) {
+                const activePlaylist = playlists.find(p => p.id === currentPlaylistId);
+                if (activePlaylist) {
+                    activePlaylist.channels = activePlaylist.channels.filter(c => getChannelKey(c) !== key);
+                    await savePlaylistToDB(activePlaylist);
+                    currentChannels = activePlaylist.channels;
+                    renderChannels();
+                    showToast("Đã xóa.", "success");
+                }
+            }
+        }
+
+        async function moveChannel(key, direction) {
+            const activePlaylist = playlists.find(p => p.id === currentPlaylistId);
+            if (!activePlaylist) return;
+            const idx = activePlaylist.channels.findIndex(c => getChannelKey(c) === key);
+            if (idx === -1) return;
+            const targetIdx = idx + direction;
+            if (targetIdx < 0 || targetIdx >= activePlaylist.channels.length) return;
+            
+            const temp = activePlaylist.channels[idx];
+            activePlaylist.channels[idx] = activePlaylist.channels[targetIdx];
+            activePlaylist.channels[targetIdx] = temp;
+
+            await savePlaylistToDB(activePlaylist);
+            currentChannels = activePlaylist.channels;
+            renderChannels();
+        }
+
+        async function sortChannelsAZ() {
+            const activePlaylist = playlists.find(p => p.id === currentPlaylistId);
+            if (!activePlaylist) return;
+            const confirmed = await showConfirm("Sắp xếp A-Z?", "Toàn bộ danh sách kênh sẽ được xếp thứ tự chữ cái.");
+            if (confirmed) {
+                activePlaylist.channels.sort((a, b) => a.name.localeCompare(b.name, 'vi', { sensitivity: 'base' }));
+                await savePlaylistToDB(activePlaylist);
+                currentChannels = activePlaylist.channels;
+                renderChannels();
+                showToast("Đã sắp xếp.", "success");
+            }
+        }
+
+        async function sortChannelsByGroup() {
+            const activePlaylist = playlists.find(p => p.id === currentPlaylistId);
+            if (!activePlaylist) return;
+            const confirmed = await showConfirm("Gom nhóm?", "Các kênh sẽ được dọn dẹp xếp theo thứ tự nhóm.");
+            if (confirmed) {
+                activePlaylist.channels.sort((a, b) => {
+                    const groupA = a.group || "";
+                    const groupB = b.group || "";
+                    if (groupA !== groupB) return groupA.localeCompare(groupB, 'vi', { sensitivity: 'base' });
+                    return a.name.localeCompare(b.name, 'vi', { sensitivity: 'base' });
+                });
+                await savePlaylistToDB(activePlaylist);
+                currentChannels = activePlaylist.channels;
+                renderChannels();
+                showToast("Đã phân gom nhóm.", "success");
+            }
+        }
+
+        // --- 8. PHÂN TÍCH XML LỊCH CHIẾU EPG CACHE ---
+        function parseXMLTV(xmlText) {
+            if (!xmlText) throw new Error("Dữ liệu trống.");
+            const parser = new DOMParser();
+            let xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            let programmes = xmlDoc.getElementsByTagName("programme");
+
+            if (programmes.length === 0) {
+                return parseXMLTVWithRegex(xmlText);
+            }
+
+            const epgData = {};
+            const now = Date.now();
+            const timeLimit = now - (6 * 60 * 60 * 1000); 
+
+            for (let i = 0; i < programmes.length; i++) {
+                const prog = programmes[i];
+                const channelId = prog.getAttribute("channel");
+                if (!channelId) continue;
+                const startTimestamp = parseEPGTime(prog.getAttribute("start"));
+                const stopTimestamp = parseEPGTime(prog.getAttribute("stop"));
+                if (!startTimestamp || !stopTimestamp) continue;
+                if (stopTimestamp < timeLimit) continue; 
+
+                const title = prog.getElementsByTagName("title")[0]?.textContent || "Chương trình tivi";
+                const desc = prog.getElementsByTagName("desc")[0]?.textContent || "Không có mô tả chi tiết.";
+
+                const normalizedKey = channelId.toLowerCase();
+                if (!epgData[normalizedKey]) epgData[normalizedKey] = [];
+                epgData[normalizedKey].push({ start: startTimestamp, stop: stopTimestamp, title, desc });
+            }
+
+            Object.keys(epgData).forEach(key => epgData[key].sort((a, b) => a.start - b.start));
+            return epgData;
+        }
+
+        function parseXMLTVWithRegex(xmlText) {
+            const epgData = {};
+            const now = Date.now();
+            const timeLimit = now - (6 * 60 * 60 * 1000);
+            const progRegex = /<programme\s+[^>]*channel="([^"]+)"[^>]*start="([^"]+)"[^>]*stop="([^"]+)"[^>]*>([\s\S]*?)<\/programme>/g;
+            let match;
+
+            while ((match = progRegex.exec(xmlText)) !== null) {
+                const channelId = match[1];
+                const startStr = match[2];
+                const stopStr = match[3];
+                const innerContent = match[4];
+
+                const startTimestamp = parseEPGTime(startStr);
+                const stopTimestamp = parseEPGTime(stopStr);
+                if (!startTimestamp || !stopTimestamp) continue;
+                if (stopTimestamp < timeLimit) continue;
+
+                const titleMatch = innerContent.match(/<title[^>]*>([\s\S]*?)<\/title>/);
+                let title = titleMatch ? titleMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/, '$1').trim() : "Chương trình tivi";
+                title = title.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+                const descMatch = innerContent.match(/<desc[^>]*>([\s\S]*?)<\/desc>/);
+                let desc = descMatch ? descMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/, '$1').trim() : "Không có mô tả.";
+                desc = desc.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+                const normalizedKey = channelId.toLowerCase();
+                if (!epgData[normalizedKey]) epgData[normalizedKey] = [];
+                epgData[normalizedKey].push({ start: startTimestamp, stop: stopTimestamp, title, desc });
+            }
+
+            Object.keys(epgData).forEach(key => epgData[key].sort((a, b) => a.start - b.start));
+            return epgData;
+        }
+
+        function parseEPGTime(timeStr) {
+            if (!timeStr) return null;
+            const parts = timeStr.trim().split(/\s+/);
+            const base = parts[0];
+            if (base.length < 14) return null;
+            const year = parseInt(base.substring(0, 4), 10);
+            const month = parseInt(base.substring(4, 6), 10) - 1;
+            const day = parseInt(base.substring(6, 8), 10);
+            const hour = parseInt(base.substring(8, 10), 10);
+            const minute = parseInt(base.substring(10, 12), 10);
+            const second = parseInt(base.substring(12, 14), 10);
+            let date = new Date(Date.UTC(year, month, day, hour, minute, second));
+            if (parts[1]) {
+                const offset = parts[1];
+                const sign = offset[0] === '+' ? -1 : 1;
+                const offsetHours = parseInt(offset.substring(1, 3), 10);
+                const offsetMins = parseInt(offset.substring(3, 5), 10);
+                const totalOffsetMins = (offsetHours * 60 + offsetMins) * sign;
+                date = new Date(date.getTime() + totalOffsetMins * 60000);
+            }
+            return date.getTime();
+        }
+
+        function loadEpgCacheFromDB() {
+            return new Promise((resolve) => {
+                if (isLocalStorageFallback) {
+                    const localEpg = localStorage.getItem("fallback_epg");
+                    epgChannelsMap = localEpg ? JSON.parse(localEpg) : {};
+                    resolve();
+                } else {
+                    if (!db) { resolve(); return; }
+                    const transaction = db.transaction("epg", "readonly");
+                    const store = transaction.objectStore("epg");
+                    const request = store.getAll();
+                    request.onsuccess = () => {
+                        const results = request.result || [];
+                        epgChannelsMap = {};
+                        results.forEach(item => {
+                            epgChannelsMap[item.channelId.toLowerCase()] = item.programs;
+                        });
+                        resolve();
+                    };
+                    request.onerror = () => {
+                        isLocalStorageFallback = true;
+                        loadEpgCacheFromDB().then(resolve);
+                    };
+                }
+            });
+        }
+
+        function saveEpgDataToDB(epgDataDict) {
+            return new Promise((resolve, reject) => {
+                if (isLocalStorageFallback) {
+                    epgChannelsMap = epgDataDict;
+                    localStorage.setItem("fallback_epg", JSON.stringify(epgDataDict));
+                    resolve();
+                } else {
+                    if (!db) { reject(new Error("Database not ready")); return; }
+                    const transaction = db.transaction("epg", "readwrite");
+                    const store = transaction.objectStore("epg");
+                    store.clear();
+                    const keys = Object.keys(epgDataDict);
+                    let completed = 0;
+                    let hasError = false;
+                    if (keys.length === 0) { resolve(); return; }
+                    keys.forEach(key => {
+                        const putRequest = store.put({ channelId: key, programs: epgDataDict[key] });
+                        putRequest.onsuccess = () => {
+                            completed++;
+                            if (completed === keys.length && !hasError) resolve();
+                        };
+                        putRequest.onerror = () => { hasError = true; reject(putRequest.error); };
+                    });
+                }
+            });
+        }
+
+        async function saveEpgSource() {
+            if (activeEpgTab === 'url') {
+                const url = document.getElementById("epgUrl").value.trim();
+                if (!url) { showToast("Vui lòng nhập đường dẫn URL!", "error"); return; }
+                showToast("Đang nạp dữ liệu lịch phát sóng EPG...", "info");
+                try {
+                    const xmlText = await fetchWithFallbackProxies(url);
+                    await processAndSaveEPG(xmlText, url);
+                } catch (err) {
+                    showToast(err.message, "error");
+                }
+            } else if (activeEpgTab === 'file') {
+                const fileInput = document.getElementById("epgFileInput");
+                if (fileInput.files.length === 0) { showToast("Vui lòng chọn tệp tin!", "error"); return; }
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    await processAndSaveEPG(e.target.result, file.name);
+                };
+                reader.readAsText(file);
+            } else {
+                const textPaste = document.getElementById("epgTextPaste").value.trim();
+                if (!textPaste) { showToast("Vui lòng nhập văn bản EPG XML!", "error"); return; }
+                await processAndSaveEPG(textPaste, "Dán trực tiếp");
+            }
+        }
+
+        async function processAndSaveEPG(xmlText, sourceName) {
+            try {
+                const epgDataDict = parseXMLTV(xmlText);
+                const count = Object.keys(epgDataDict).length;
+                if (count === 0) throw new Error("File trống hoặc lỗi EPG.");
+                await saveEpgDataToDB(epgDataDict);
+                localStorage.setItem("iptv_epg_last_update", Date.now().toString());
+                localStorage.setItem("iptv_epg_source_url", sourceName);
+                await loadEpgCacheFromDB();
+                initEpgUI();
+                renderChannels();
+                updateCurrentEpgDisplay();
+                toggleEpgModal(false);
+                showToast(`Nạp thành công ${count} kênh lịch chiếu!`, "success");
+            } catch (err) {
+                showToast(`Đồng bộ thất bại: ${err.message}`, "error");
+            }
+        }
+
+        function initEpgUI() {
+            const lastUpdate = localStorage.getItem("iptv_epg_last_update");
+            const sourceUrl = localStorage.getItem("iptv_epg_source_url") || "Chưa cài đặt";
+            const lblSource = document.getElementById("lblEpgSource");
+            const lblLastUpdate = document.getElementById("lblEpgLastUpdate");
+            const lblCount = document.getElementById("lblEpgChannelsCount");
+
+            if (lblSource) lblSource.textContent = sourceUrl;
+            if (lblLastUpdate) lblLastUpdate.textContent = lastUpdate ? new Date(parseInt(lastUpdate, 10)).toLocaleString() : "Chưa rõ";
+            if (lblCount) lblCount.textContent = Object.keys(epgChannelsMap).length;
+        }
+
+        async function deleteEpgData() {
+            const confirmed = await showConfirm("Dọn EPG?", "Lịch phát sóng sẽ bị xóa.");
+            if (confirmed) {
+                if (isLocalStorageFallback) {
+                    epgChannelsMap = {};
+                    localStorage.removeItem("fallback_epg");
+                    localStorage.removeItem("iptv_epg_last_update");
+                    localStorage.removeItem("iptv_epg_source_url");
+                    initEpgUI();
+                    renderChannels();
+                    updateCurrentEpgDisplay();
+                    showToast("Đã dọn dẹp EPG.", "success");
+                } else {
+                    if (!db) { showToast("Cơ sở dữ liệu chưa sẵn sàng!", "error"); return; }
+                    const transaction = db.transaction("epg", "readwrite");
+                    transaction.objectStore("epg").clear();
+                    epgChannelsMap = {};
+                    localStorage.removeItem("iptv_epg_last_update");
+                    localStorage.removeItem("iptv_epg_source_url");
+                    initEpgUI();
+                    renderChannels();
+                    updateCurrentEpgDisplay();
+                    showToast("Đã dọn dẹp EPG.", "success");
+                }
+            }
+        }
+
+        // --- 9. HIỂN THỊ DANH SÁCH KÊNH VÀ PERFORMANCE GUARD ---
+        function renderChannels() {
+            const listContainer = document.getElementById("channelList");
+            const searchQuery = document.getElementById("searchInput").value.toLowerCase().trim();
+            const groupFilter = document.getElementById("groupSelect").value;
+            
+            listContainer.innerHTML = "";
+
+            if (currentChannels.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-10 text-muted text-xs">Danh sách tivi trống. Hãy mở Cài đặt để nạp kênh.</div>`;
+                document.getElementById("channelCount").textContent = "Kênh: 0";
+                return;
+            }
+
+            const filtered = currentChannels.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(searchQuery);
+                const matchesGroup = groupFilter === "all" || c.group === groupFilter;
+                const chanKey = getChannelKey(c);
+                const isFav = !!favorites[chanKey];
+                const matchesFav = !showFavoritesOnly || isFav;
+                const isHidden = !!hiddenChannels[chanKey];
+                const matchesHidden = showHidden || !isHidden;
+                return matchesSearch && matchesGroup && matchesFav && matchesHidden;
+            });
+
+            // Performance Guard: Giới hạn DOM vẽ để tránh giật lag
+            const MAX_DISPLAY = 150;
+            const displayed = filtered.slice(0, MAX_DISPLAY);
+
+            document.getElementById("channelCount").textContent = `Đang lọc: ${filtered.length}/${currentChannels.length}`;
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-10 text-muted text-xs">Không tìm thấy kênh phù hợp.</div>`;
+                return;
+            }
+
+            displayed.forEach(chan => {
+                const chanKey = getChannelKey(chan);
+                const isFav = !!favorites[chanKey];
+                const isPlaying = currentActiveChannels[activeSlotIndex] && currentActiveChannels[activeSlotIndex].url === chan.url;
+                const isHidden = !!hiddenChannels[chanKey];
+
+                const epgPrograms = getChannelEpgPrograms(chan);
+                const currentProg = getActiveProgram(epgPrograms);
+                
+                let epgSectionHtml = '';
+                if (currentProg) {
+                    const startStr = new Date(currentProg.start).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                    const stopStr = new Date(currentProg.stop).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                    const totalDur = currentProg.stop - currentProg.start;
+                    const elapsed = Date.now() - currentProg.start;
+                    const pct = Math.max(0, Math.min(100, (elapsed / totalDur) * 100));
+
+                    epgSectionHtml = `
+                        <div class="mt-1.5 flex flex-col gap-0.5 min-w-0">
+                            <span class="text-primary text-[9px] truncate font-bold flex items-center gap-1">
+                                <i class="fa-regular fa-clock"></i> ${startStr} - ${stopStr} • ${currentProg.title}
+                            </span>
+                            <div class="w-full bg-borderInput/30 rounded-full h-1 overflow-hidden">
+                                <div class="bg-primary h-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                let editToolsHtml = '';
+                if (editMode) {
+                    editToolsHtml = `
+                        <div class="flex items-center gap-1 mt-2 pt-1.5 border-t border-borderInput/20 shrink-0">
+                            <button onclick="moveChannel('${chanKey}', -1)" class="p-1 text-muted hover:text-main text-[9px] bg-variant rounded-lg border border-borderInput flex-1 flex items-center justify-center gap-0.5">
+                                <i class="fa-solid fa-arrow-up text-[8px]"></i>
+                            </button>
+                            <button onclick="moveChannel('${chanKey}', 1)" class="p-1 text-muted hover:text-main text-[9px] bg-variant rounded-lg border border-borderInput flex-1 flex items-center justify-center gap-0.5">
+                                <i class="fa-solid fa-arrow-down text-[8px]"></i>
+                            </button>
+                            <button onclick="hideChannel('${chanKey}')" class="p-1 ${isHidden ? 'text-green-500 hover:text-green-400' : 'text-muted hover:text-main'} text-[9px] bg-variant rounded-lg border border-borderInput flex-1 flex items-center justify-center gap-0.5">
+                                <i class="fa-solid ${isHidden ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                            </button>
+                            <button onclick="deleteChannel('${chanKey}')" class="p-1 text-red-500 hover:text-red-400 text-[9px] bg-variant rounded-lg border border-borderInput flex-1 flex items-center justify-center gap-0.5">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                const div = document.createElement("div");
+                div.className = `channel-item group flex flex-col p-2.5 rounded-xl transition border ${isPlaying ? 'bg-cardActive border-primary/45 shadow-sm' : 'hover:bg-variant/60 border-borderColor bg-variant/20'} ${isHidden ? 'opacity-40' : ''}`;
+                div.setAttribute("tabindex", "0");
+                div.onclick = (e) => {
+                    if (e.target.closest('button')) return;
+                    playChannel(chan);
+                };
+
+                div.innerHTML = `
+                    <div class="flex items-center justify-between min-w-0">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <img src="${chan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-8 h-8 rounded-lg object-contain bg-variant border border-borderInput p-1 shrink-0">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="text-xs font-bold text-main truncate ${isPlaying ? 'text-primary' : ''}">${chan.name}</h4>
+                                <p class="text-[9px] text-muted font-bold mt-0.5 truncate">${chan.group}</p>
+                            </div>
+                        </div>
+                        <button class="text-muted hover:text-yellow-500 p-1 transition shrink-0" onclick="toggleFavorite('${chanKey}')">
+                            <i class="${isFav ? 'fa-solid fa-star text-yellow-500' : 'fa-regular fa-star'}"></i>
+                        </button>
+                    </div>
+                    ${epgSectionHtml}
+                    ${editToolsHtml}
+                `;
+                listContainer.appendChild(div);
+            });
+
+            if (filtered.length > MAX_DISPLAY) {
+                const hintDiv = document.createElement("div");
+                hintDiv.className = "text-center py-3 text-muted text-[10px] italic border-t border-borderColor/20 mt-2 shrink-0";
+                hintDiv.textContent = `Chỉ hiển thị ${MAX_DISPLAY} kênh đầu tiên. Hãy dùng thanh tìm kiếm để lọc tiếp.`;
+                listContainer.appendChild(hintDiv);
+            }
+        }
+
+        let filterTimeout = null;
+        function filterChannels() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                renderChannels();
+            }, 150);
+        }
+
+        function getChannelKey(chan) {
+            return `${chan.name}_${chan.url}`.replace(/[^a-zA-Z0-9]/g, "_");
+        }
+
+        function getChannelEpgPrograms(channel) {
+            if (!channel) return null;
+            if (channel.tvgId) {
+                const programs = epgChannelsMap[channel.tvgId.toLowerCase()];
+                if (programs) return programs;
+            }
+            if (channel.name) {
+                const nameKey = channel.name.toLowerCase().trim();
+                const programs = epgChannelsMap[nameKey];
+                if (programs) return programs;
+            }
+            return null;
+        }
+
+        function getActiveProgram(programs) {
+            if (!programs) return null;
+            const now = Date.now();
+            return programs.find(p => p.start <= now && p.stop >= now);
+        }
+
+        function toggleFavoritesOnly() {
+            showFavoritesOnly = !showFavoritesOnly;
+            const btn = document.getElementById("favToggleBtn");
+            if (showFavoritesOnly) {
+                btn.classList.add("bg-primary/10", "text-yellow-500", "border-primary/40");
+            } else {
+                btn.classList.remove("bg-primary/10", "text-yellow-500", "border-primary/40");
+            }
+            renderChannels();
+        }
+
+        function setSidebarView(view) {
+            currentSidebarView = view;
+            const tabChannels = document.getElementById("sidebarTabChannels");
+            const tabEpg = document.getElementById("sidebarTabEpg");
+            const channelList = document.getElementById("channelList");
+            const epgContainer = document.getElementById("sidebarEpgContainer");
+
+            if (view === 'channels') {
+                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
+                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
+                channelList.classList.remove("hidden");
+                epgContainer.classList.add("hidden");
+            } else {
+                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
+                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
+                channelList.classList.add("hidden");
+                epgContainer.classList.remove("hidden");
+                updateSidebarEpgDisplay(); // Cập nhật lịch chiếu ngay
+            }
+        }
+
+        function toggleEpgTimeline(forceState = null) {
+            // Khi nhấn nút Lịch Chiếu từ trình phát, chuyển hướng Tab Sidebar tương ứng
+            setSidebarView('epg');
+        }
+
+        // --- 10. ĐẦU PHÁT TRÌNH CHIẾU MULTI-VIEW & VOD TIMELINE ---
+        function playChannel(chan) {
+            currentActiveChannels[activeSlotIndex] = chan;
+            const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
+            const visualizer = document.getElementById(`audioVisualizer${activeSlotIndex}`);
+            const placeholder = document.getElementById("playerPlaceholder");
+
+            if (placeholder) placeholder.classList.add("hidden");
+
+            const isAudioOnly = chan.group.toLowerCase().includes("radio") || 
+                                chan.group.toLowerCase().includes("music") || 
+                                chan.name.toLowerCase().includes("radio");
+
+            if (visualizer) {
+                if (isAudioOnly) visualizer.classList.remove("hidden");
+                else visualizer.classList.add("hidden");
+            }
+
+            const currentTitleEl = document.getElementById("currentTitle");
+            const currentGroupEl = document.getElementById("currentGroup");
+            const currentLogoEl = document.getElementById("currentLogo");
+
+            if (activeSlotIndex === 0 || !multiViewActive) {
+                if (currentTitleEl) currentTitleEl.textContent = chan.name;
+                if (currentGroupEl) currentGroupEl.textContent = chan.group;
+                if (currentLogoEl) currentLogoEl.src = chan.logo || '';
+            }
+
+            if (players[activeSlotIndex]) {
+                players[activeSlotIndex].destroy();
+                players[activeSlotIndex] = null;
+            }
+
+            for (let i = 0; i < 4; i++) {
+                const v = document.getElementById(`videoPlayer${i}`);
+                if (v) { v.muted = (i !== activeSlotIndex); }
+            }
+
+            const isHlsStream = chan.url.includes(".m3u8") || chan.url.includes("m3u8");
+
+            if (isHlsStream) {
+                if (Hls.isSupported()) {
+                    const hls = new Hls({ 
+                        maxMaxBufferLength: 10, 
+                        enableWorker: true, 
+                        lowLatencyMode: true,
+                        backBufferLength: 30
+                    });
+                    players[activeSlotIndex] = hls;
+                    hls.loadSource(chan.url);
+                    hls.attachMedia(video);
+                    
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() { safePlay(video); });
+                    hls.on(Hls.Events.ERROR, function (event, data) {
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    video.src = chan.url;
+                                    break;
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = chan.url;
+                    video.addEventListener('loadedmetadata', function() { safePlay(video); }, { once: true });
+                } else {
+                    showToast("Luồng HLS .m3u8 không được hỗ trợ bởi trình duyệt này.", "error");
+                }
+            } else {
+                video.src = chan.url;
+                safePlay(video);
+            }
+
+            const playBtn = document.getElementById("ctrlPlayBtn");
+            if (playBtn) playBtn.innerHTML = `<i class="fa-solid fa-pause text-[10px]"></i>`;
+            
+            updateFavBtnUI();
+            updateCurrentEpgDisplay();
+            triggerChannelHud();
+        }
+
+        function togglePlayPause() {
+            const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
+            const btn = document.getElementById("ctrlPlayBtn");
+            if (!video) return;
+            if (video.paused) {
+                safePlay(video);
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-pause text-[10px]"></i>`;
+            } else {
+                video.pause();
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[10px]"></i>`;
+            }
+        }
+
+        function toggleMute() {
+            const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
+            const btn = document.getElementById("ctrlMuteBtn");
+            if (!video) return;
+            video.muted = !video.muted;
+            if (btn) btn.innerHTML = video.muted ? `<i class="fa-solid fa-volume-xmark text-[10px]"></i>` : `<i class="fa-solid fa-volume-high text-[10px]"></i>`;
+        }
+
+        function onVolumeSliderChange() {
+            const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
+            const slider = document.getElementById("ctrlVolumeSlider");
+            if (video && slider) video.volume = parseFloat(slider.value);
+        }
+
+        function togglePip() {
+            const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
+            if (!video) return;
+            if (document.pictureInPictureElement) document.exitPictureInPicture();
+            else video.requestPictureInPicture().catch(() => showToast("Lỗi mở PIP", "error"));
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById("videoPlayer" + activeSlotIndex);
+            if (!container) return;
+            if (document.fullscreenElement) document.exitFullscreen();
+            else container.requestFullscreen();
+        }
+
+        function retryPlayback() {
+            const chan = currentActiveChannels[activeSlotIndex];
+            if (chan) playChannel(chan);
+        }
+
+        function toggleFavorite(key) {
+            if (favorites[key]) delete favorites[key];
+            else favorites[key] = true;
+            localStorage.setItem("iptv_favorites", JSON.stringify(favorites));
+            renderChannels();
+            updateFavBtnUI();
+        }
+
+        function toggleCurrentFavorite() {
+            const activeChan = currentActiveChannels[activeSlotIndex];
+            if (activeChan) toggleFavorite(getChannelKey(activeChan));
+        }
+
+        function updateFavBtnUI() {
+            const btn = document.getElementById("favoriteBtn");
+            const activeChan = currentActiveChannels[activeSlotIndex];
+            if (!activeChan || !btn) return;
+            const key = getChannelKey(activeChan);
+            if (favorites[key]) {
+                btn.className = "bg-yellow-500/10 text-yellow-500 p-2 rounded-full border border-yellow-500/20 w-9 h-9 flex items-center justify-center shadow-inner";
+                btn.innerHTML = `<i class="fa-solid fa-star text-xs"></i>`;
+            } else {
+                btn.className = "bg-variant text-muted hover:text-main p-2 rounded-full border border-borderInput w-9 h-9 flex items-center justify-center";
+                btn.innerHTML = `<i class="fa-regular fa-star text-xs"></i>`;
+            }
+        }
+
+        // --- 11. CÀI ĐẶT GIAO DIỆN & THANH ĐIỀU HƯỚNG BÊN ---
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            const sidebar = document.getElementById("sidebarSection");
+            const toggleIcon = document.getElementById("sidebarToggleIcon");
+            const toggleBtn = document.getElementById("sidebarToggleBtn");
+            
+            if (sidebarCollapsed) {
+                sidebar.classList.add("hidden-sidebar");
+                if (toggleIcon) toggleIcon.className = "fa-solid fa-chevron-right text-[10px]";
+                if (toggleBtn) toggleBtn.style.left = "15px";
+            } else {
+                sidebar.classList.remove("hidden-sidebar");
+                if (toggleIcon) toggleIcon.className = "fa-solid fa-chevron-left text-[10px]";
+                if (toggleBtn) toggleBtn.style.left = "";
+            }
+        }
+
+        function toggleCinemaMode() {
+            cinemaModeActive = !cinemaModeActive;
+            const body = document.body;
+            const lampBtn = document.getElementById("ctrlCinemaBtn");
+
+            if (cinemaModeActive) {
+                body.classList.add("cinema-mode-active");
+                if (lampBtn) {
+                    lampBtn.innerHTML = `<i class="fa-regular fa-lightbulb text-[9px]"></i>`;
+                    lampBtn.classList.add("bg-yellow-500/10", "text-yellow-400");
+                }
+                showToast("Bật chế độ rạp phim tối giản.", "success");
+            } else {
+                body.classList.remove("cinema-mode-active");
+                if (lampBtn) {
+                    lampBtn.innerHTML = `<i class="fa-solid fa-lightbulb text-[9px]"></i>`;
+                    lampBtn.classList.remove("bg-yellow-500/10", "text-yellow-400");
+                }
+            }
+        }
+
+        function toggleSettingsModal(show) {
+            document.getElementById("settingsModal").classList.toggle("hidden", !show);
+        }
+
+        function togglePlaylistModal(show) {
+            document.getElementById("playlistModal").classList.toggle("hidden", !show);
+        }
+
         function toggleEpgModal(show) {
             document.getElementById("epgModal").classList.toggle("hidden", !show);
         }
@@ -193,73 +2009,47 @@
             document.getElementById("panel-file").classList.toggle("hidden", tab !== 'file');
         }
 
-        function setSidebarView(view) {
-            currentSidebarView = view;
-            const tabChannels = document.getElementById("sidebarTabChannels");
-            const tabEpg = document.getElementById("sidebarTabEpg");
-            const channelList = document.getElementById("channelList");
-            const epgContainer = document.getElementById("sidebarEpgContainer");
-
-            if (view === 'channels') {
-                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
-                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
-                channelList.classList.remove("hidden");
-                epgContainer.classList.add("hidden");
-            } else {
-                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
-                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
-                channelList.classList.add("hidden");
-                epgContainer.classList.remove("hidden");
-                updateSidebarEpgDisplay(); // Cập nhật nội dung lịch phát sóng ngay khi hiển thị
-            }
-        }
-
-        function toggleEpgTimeline(forceState = null) {
-            const epgContainer = document.getElementById("sidebarEpgContainer");
-            const isHidden = epgContainer.classList.contains("hidden");
-            const shouldShow = forceState !== null ? forceState : isHidden;
-
-            if (shouldShow) {
-                setSidebarView('epg');
-            } else {
-                setSidebarView('channels');
-            }
-        }
-
         function applyUiTheme(themeName) {
-<!-- ... existing code ... -->
-        function triggerChannelHud() {
-            const hud = document.getElementById("channelHud");
-            const activeChan = currentActiveChannels[activeSlotIndex];
-            if (!activeChan) return;
-
-            document.getElementById("hudChannelName").textContent = activeChan.name;
-            document.getElementById("hudLogo").src = activeChan.logo || '';
-            const programs = getChannelEpgPrograms(activeChan);
-            const activeProg = getActiveProgram(programs);
-            const progTitleEl = document.getElementById("hudProgramTitle");
-            const progTimeEl = document.getElementById("hudProgramTime");
-
-            if (activeProg) {
-                progTitleEl.textContent = activeProg.title;
-                const startTime = new Date(activeProg.start).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
-                const stopTime = new Date(activeProg.stop).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
-                progTimeEl.textContent = `${startTime} - ${stopTime}`;
+            const html = document.documentElement;
+            if (themeName === 'light') {
+                html.classList.remove('dark-theme');
+                html.classList.add('light-theme');
             } else {
-                progTitleEl.textContent = "Không có thông tin lịch chiếu";
-                progTimeEl.textContent = "00:00 - 00:00";
+                html.classList.remove('light-theme');
+                html.classList.add('dark-theme');
             }
-
-            hud.classList.remove("opacity-0", "translate-y-6", "pointer-events-none");
-            hud.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
-
-            clearTimeout(hudTimer);
-            hudTimer = setTimeout(() => {
-                hud.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
-                hud.classList.add("opacity-0", "translate-y-6", "pointer-events-none");
-            }, 3000);
+            localStorage.setItem("iptv_ui_theme", themeName);
         }
 
+        function applyColorTheme(themeName) {
+            const theme = colorThemes[themeName] || colorThemes.purple;
+            const root = document.documentElement;
+            root.style.setProperty('--color-primary', theme.primary);
+            root.style.setProperty('--color-primary-hover', theme.hover);
+            root.style.setProperty('--color-primary-light', theme.light);
+            root.style.setProperty('--color-primary-light-bg', theme.lightAlpha);
+            root.style.setProperty('--color-primary-focus-alpha', theme.focusAlpha);
+            localStorage.setItem("iptv_color_theme", themeName);
+        }
+
+        async function clearAllData() {
+            const confirmed = await showConfirm("Xóa sạch bộ nhớ?", "Toàn bộ danh sách kênh và lịch phát sóng đã lưu sẽ bị gỡ bỏ khỏi máy của bạn.", true);
+            if (confirmed) {
+                playlists = [];
+                currentChannels = [];
+                currentActiveChannels = [null, null, null, null];
+                favorites = {};
+                epgChannelsMap = {};
+
+                localStorage.clear();
+                updatePlaylistDropdown();
+                renderChannels();
+                updateCurrentEpgDisplay();
+                showToast("Đã dọn sạch tivi.", "success");
+            }
+        }
+
+        // --- 11.2 UPDATE SIDEBAR EPG DETAIL TIMELINE ---
         function updateSidebarEpgDisplay() {
             const container = document.getElementById("sidebarEpgContainer");
             const activeChan = currentActiveChannels[activeSlotIndex];
@@ -353,6 +2143,343 @@
             container.innerHTML = html;
         }
 
+        // --- 12. TƯƠNG TÁC THAO TÁC TRÊN PLAYER SLOTS (DBLCLICK SEEK & VOD) ---
+        function setupPlaybackInteractions(slotIndex) {
+            const video = document.getElementById(`videoPlayer${slotIndex}`);
+            const container = document.getElementById(`mvSlot${slotIndex}`);
+            if (!video || !container) return;
+            
+            video.addEventListener('error', function() {
+                console.warn(`[Video Slot ${slotIndex}] Nguồn phát trống hoặc đang dọn luồng cũ.`);
+            });
+
+            container.addEventListener('dblclick', function(e) {
+                const rect = container.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const width = rect.width;
+                if (clickX < width * 0.4) {
+                    seekRelative(slotIndex, -10);
+                    showSeekFeedback(slotIndex, 'left');
+                } else if (clickX > width * 0.6) {
+                    seekRelative(slotIndex, 10);
+                    showSeekFeedback(slotIndex, 'right');
+                }
+            });
+
+            video.addEventListener('durationchange', function() { updateControlsSeekbar(slotIndex); });
+            video.addEventListener('timeupdate', function() {
+                if (slotIndex === activeSlotIndex) updateVodProgressUI();
+            });
+        }
+
+        function seekRelative(slotIndex, seconds) {
+            const video = document.getElementById(`videoPlayer${slotIndex}`);
+            if (video && !isNaN(video.duration) && video.duration !== Infinity) {
+                video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + seconds));
+                updateVodProgressUI();
+            }
+        }
+
+        function showSeekFeedback(slotIndex, direction) {
+            const feedback = document.getElementById(`seek${direction === 'left' ? 'Left' : 'Right'}Feedback${slotIndex}`);
+            if (feedback) {
+                feedback.style.opacity = '1';
+                setTimeout(() => feedback.style.opacity = '0', 800);
+            }
+        }
+
+        function updateControlsSeekbar(slotIndex) {
+            if (slotIndex !== activeSlotIndex) return;
+            const video = document.getElementById(`videoPlayer${slotIndex}`);
+            const progressContainer = document.getElementById("vodProgressContainer");
+            const liveStatusDot = document.getElementById("liveStatusDot");
+            const liveStatusText = document.getElementById("liveStatusText");
+            const durationLabel = document.getElementById("controlDuration");
+
+            if (!progressContainer) return;
+
+            if (video && !isNaN(video.duration) && video.duration !== Infinity && video.duration > 0) {
+                progressContainer.classList.remove("hidden");
+                if (liveStatusDot) liveStatusDot.classList.add("hidden");
+                if (liveStatusText) liveStatusText.classList.add("hidden");
+                if (durationLabel) durationLabel.textContent = "Chế độ VOD";
+            } else {
+                progressContainer.classList.add("hidden");
+                if (liveStatusDot) liveStatusDot.classList.remove("hidden");
+                if (liveStatusText) liveStatusText.classList.remove("hidden");
+                if (durationLabel) durationLabel.textContent = "Luồng phát trực tiếp";
+            }
+        }
+
+        function updateVodProgressUI() {
+            const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
+            const progressBar = document.getElementById("vodProgressBar");
+            const currentLabel = document.getElementById("vodCurrentTime");
+            const totalLabel = document.getElementById("vodTotalDuration");
+            if (video && !isNaN(video.duration) && video.duration !== Infinity) {
+                const current = video.currentTime;
+                const total = video.duration;
+                if (progressBar) progressBar.value = (current / total) * 100;
+                if (currentLabel) currentLabel.textContent = formatTime(current);
+                if (totalLabel) totalLabel.textContent = formatTime(total);
+            }
+        }
+
+        function seekVodMedia() {
+            const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
+            const progressBar = document.getElementById("vodProgressBar");
+            if (video && !isNaN(video.duration) && video.duration !== Infinity && progressBar) {
+                video.currentTime = (progressBar.value / 100) * video.duration;
+            }
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00:00";
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        // Lắng nghe phím tắt điều khiển
+        document.addEventListener('keydown', function(e) {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') {
+                seekRelative(activeSlotIndex, -10);
+                showSeekFeedback(activeSlotIndex, 'left');
+                e.preventDefault();
+            } else if (e.key === 'ArrowRight') {
+                seekRelative(activeSlotIndex, 10);
+                showSeekFeedback(activeSlotIndex, 'right');
+                e.preventDefault();
+            } else if (e.key === ' ') {
+                togglePlayPause();
+                e.preventDefault();
+            }
+        });
+
+        // --- 13. QUẢN LÝ BỐ CỤC ĐA MÀN HÌNH ---
+        function stopSlotPlayback(index) {
+            const video = document.getElementById(`videoPlayer${index}`);
+            if (video) {
+                try {
+                    video.pause();
+                    video.src = "";
+                    video.removeAttribute("src");
+                    video.load();
+                } catch (e) {
+                    console.warn("Dọn dẹp luồng tivi slot:", index);
+                }
+            }
+            if (players[index]) {
+                try { players[index].destroy(); } catch (e) {}
+                players[index] = null;
+            }
+            currentActiveChannels[index] = null;
+            const visualizer = document.getElementById(`audioVisualizer${index}`);
+            if (visualizer) { visualizer.classList.add("hidden"); }
+        }
+
+        function selectPrimaryMultiView(type) {
+            const container2 = document.getElementById("subMvContainer_2");
+            const container4 = document.getElementById("subMvContainer_4");
+            
+            // Highlight buttons
+            const btn1 = document.getElementById("primaryMvBtn_1");
+            const btn2 = document.getElementById("primaryMvBtn_2");
+            const btn4 = document.getElementById("primaryMvBtn_4");
+            
+            [btn1, btn2, btn4].forEach(btn => {
+                if (btn) btn.className = "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted";
+            });
+            
+            const selectedBtn = document.getElementById(`primaryMvBtn_${type}`);
+            if (selectedBtn) selectedBtn.className = "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white";
+
+            if (type === '1') {
+                if (container2) container2.classList.add("hidden");
+                if (container4) container4.classList.add("hidden");
+                setMultiView('1');
+            } else if (type === '2') {
+                if (container2) container2.classList.remove("hidden");
+                if (container4) container4.classList.add("hidden");
+                setMultiView('2-horiz');
+            } else if (type === '4') {
+                if (container2) container2.classList.add("hidden");
+                if (container4) container4.classList.remove("hidden");
+                setMultiView('4-grid');
+            }
+        }
+
+        function setMultiView(format) {
+            multiViewFormat = format;
+            const grid = document.getElementById("multiviewGrid");
+            
+            grid.className = "multiview-grid";
+            grid.classList.remove("grid-layout-1-3");
+            
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`mvSlot${i}`).className = "multiview-box hidden";
+                multiViewSlots[i] = false;
+            }
+            
+            if (format === '1') {
+                grid.className = "multiview-grid grid-cols-1";
+                grid.classList.remove("multi-active");
+                document.getElementById("mvSlot0").className = "multiview-box active-slot";
+                multiViewSlots[0] = true;
+                multiViewActive = false;
+            } else if (format === '2-horiz') {
+                grid.className = "multiview-grid grid-cols-2";
+                grid.classList.add("multi-active");
+                document.getElementById("mvSlot0").className = "multiview-box";
+                document.getElementById("mvSlot1").className = "multiview-box";
+                multiViewSlots[0] = true;
+                multiViewSlots[1] = true;
+                multiViewActive = true;
+            } else if (format === '2-vert') {
+                grid.className = "multiview-grid grid-cols-1 grid-rows-2";
+                grid.classList.add("multi-active");
+                document.getElementById("mvSlot0").className = "multiview-box";
+                document.getElementById("mvSlot1").className = "multiview-box";
+                multiViewSlots[0] = true;
+                multiViewSlots[1] = true;
+                multiViewActive = true;
+            } else if (format === '4-grid') {
+                grid.className = "multiview-grid grid-cols-2 grid-rows-2";
+                grid.classList.add("multi-active");
+                for (let i = 0; i < 4; i++) {
+                    document.getElementById(`mvSlot${i}`).className = "multiview-box";
+                    multiViewSlots[i] = true;
+                }
+                multiViewActive = true;
+            } else if (format === '4-1-3') {
+                grid.className = "multiview-grid grid-layout-1-3 multi-active";
+                document.getElementById("mvSlot0").className = "multiview-box main-slot";
+                
+                let subSlotsContainer = document.getElementById("subSlotsWrapper");
+                if (!subSlotsContainer) {
+                    subSlotsContainer = document.createElement("div");
+                    subSlotsContainer.id = "subSlotsWrapper";
+                    subSlotsContainer.className = "sub-slots";
+                    grid.appendChild(subSlotsContainer);
+                }
+                
+                for (let i = 1; i < 4; i++) {
+                    const slot = document.getElementById(`mvSlot${i}`);
+                    slot.className = "multiview-box";
+                    subSlotsContainer.appendChild(slot);
+                    multiViewSlots[i] = true;
+                }
+                multiViewSlots[0] = true;
+                multiViewActive = true;
+            }
+            
+            if (format !== '4-1-3') {
+                const subSlotsContainer = document.getElementById("subSlotsWrapper");
+                if (subSlotsContainer) {
+                    for (let i = 1; i < 4; i++) {
+                        grid.appendChild(document.getElementById(`mvSlot${i}`));
+                    }
+                    subSlotsContainer.remove();
+                }
+            }
+
+            for (let i = 0; i < 4; i++) {
+                if (!multiViewSlots[i]) { stopSlotPlayback(i); }
+            }
+            if (!multiViewSlots[activeSlotIndex]) {
+                selectSlot(0);
+            } else {
+                selectSlot(activeSlotIndex);
+            }
+            
+            const formats = ['2-horiz', '2-vert', '4-grid', '4-1-3'];
+            formats.forEach(f => {
+                const btn = document.getElementById(`mvBtn_${f}`);
+                if (btn) {
+                    if (f === format) {
+                        btn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-primary text-white";
+                    } else {
+                        btn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-variant border border-borderInput text-muted hover:text-main";
+                    }
+                }
+            });
+            
+            showToast(`Thay đổi bố cục đa màn hình.`, "success");
+        }
+
+        function selectSlot(index) {
+            if (!multiViewSlots[index]) return;
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`mvSlot${i}`).classList.remove("active-slot");
+            }
+            activeSlotIndex = index;
+            document.getElementById(`mvSlot${index}`).classList.add("active-slot");
+
+            for (let i = 0; i < 4; i++) {
+                const vid = document.getElementById(`videoPlayer${i}`);
+                if (vid) { vid.muted = (i !== activeSlotIndex); }
+            }
+
+            const activeChan = currentActiveChannels[activeSlotIndex];
+            if (activeChan) {
+                document.getElementById("currentTitle").textContent = activeChan.name;
+                document.getElementById("currentGroup").textContent = activeChan.group;
+                document.getElementById("currentLogo").src = activeChan.logo || '';
+                updateFavBtnUI();
+                updateCurrentEpgDisplay();
+                updateControlsSeekbar(activeSlotIndex);
+            } else {
+                document.getElementById("currentTitle").textContent = "Chưa chọn kênh phát";
+                document.getElementById("currentGroup").textContent = "Chọn một kênh bất kỳ bên trái để tải vào đây";
+                document.getElementById("currentLogo").src = 'https://placehold.co/80x80/252529/d0bcff?text=TV';
+            }
+        }
+
+        function stopAllPlaybacks() {
+            for (let i = 0; i < 4; i++) { stopSlotPlayback(i); }
+            const placeholder = document.getElementById("playerPlaceholder");
+            if (placeholder) placeholder.classList.remove("hidden");
+            document.getElementById("currentTitle").textContent = "Chưa chọn kênh phát";
+            document.getElementById("currentGroup").textContent = "Chọn một kênh bất kỳ bên trái";
+            document.getElementById("currentLogo").src = 'https://placehold.co/80x80/252529/d0bcff?text=TV';
+            document.getElementById("epgCurrentBar").classList.add("hidden");
+            showToast("Đã dừng tất cả trình phát.", "success");
+        }
+
+        function triggerChannelHud() {
+            const hud = document.getElementById("channelHud");
+            const activeChan = currentActiveChannels[activeSlotIndex];
+            if (!activeChan || !hud) return;
+
+            document.getElementById("hudChannelName").textContent = activeChan.name;
+            document.getElementById("hudLogo").src = activeChan.logo || '';
+            const programs = getChannelEpgPrograms(activeChan);
+            const activeProg = getActiveProgram(programs);
+            const progTitleEl = document.getElementById("hudProgramTitle");
+            const progTimeEl = document.getElementById("hudProgramTime");
+
+            if (activeProg) {
+                progTitleEl.textContent = activeProg.title;
+                const startTime = new Date(activeProg.start).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                const stopTime = new Date(activeProg.stop).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                progTimeEl.textContent = `${startTime} - ${stopTime}`;
+            } else {
+                progTitleEl.textContent = "Không có thông tin lịch chiếu";
+                progTimeEl.textContent = "00:00 - 00:00";
+            }
+
+            hud.classList.remove("opacity-0", "translate-y-6", "pointer-events-none");
+            hud.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+
+            clearTimeout(hudTimer);
+            hudTimer = setTimeout(() => {
+                hud.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+                hud.classList.add("opacity-0", "translate-y-6", "pointer-events-none");
+            }, 3000);
+        }
+
         function updateCurrentEpgDisplay() {
             const epgBar = document.getElementById("epgCurrentBar");
             const activeChan = currentActiveChannels[activeSlotIndex];
@@ -382,4 +2509,46 @@
         }
 
         // --- 14. KHỞI CHẠY HỆ THỐNG ĐỒNG BỘ (WINDOW ONLOAD) ---
-<!-- ... existing code ... -->
+        window.onload = async function() {
+            try {
+                // Khởi tạo IndexedDB trước
+                await initDB();
+                // Nạp playlists và EPG an toàn
+                await loadPlaylistsFromDB();
+                await loadEpgCacheFromDB();
+                
+                const savedTheme = localStorage.getItem("iptv_ui_theme") || "dark";
+                const savedColor = localStorage.getItem("iptv_color_theme") || "purple";
+                applyUiTheme(savedTheme);
+                applyColorTheme(savedColor);
+
+                for (let i = 0; i < 4; i++) {
+                    setupPlaybackInteractions(i);
+                }
+
+                initEpgUI();
+                setInterval(updateLiveCalendarAndClock, 1000);
+                updateLiveCalendarAndClock();
+                
+                const container = document.getElementById("multiviewGrid");
+                container.addEventListener('mousemove', function() {
+                    const controls = document.getElementById("customControls");
+                    if (controls) {
+                        controls.style.opacity = "1";
+                        clearTimeout(controlHideTimer);
+                        controlHideTimer = setTimeout(() => {
+                            controls.style.opacity = "0";
+                        }, 3000);
+                    }
+                });
+
+                // Kiểm tra thay đổi lịch trình định kỳ mỗi 60 giây
+                setInterval(updateEpgUIAndProgress, 60000);
+            } catch (err) {
+                console.error("Lỗi khởi tạo hệ thống:", err);
+                showToast("Có lỗi xảy ra trong quá trình nạp dữ liệu.", "error");
+            }
+        };
+    </script>
+</body>
+</html>
