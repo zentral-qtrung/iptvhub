@@ -2158,6 +2158,39 @@
             if (visualizer) { visualizer.classList.add("hidden"); }
         }
 
+        function selectPrimaryMultiView(screens) {
+            // Cập nhật trạng thái active trực quan cho nút chính
+            const btn1 = document.getElementById("primaryMvBtn_1");
+            const btn2 = document.getElementById("primaryMvBtn_2");
+            const btn4 = document.getElementById("primaryMvBtn_4");
+            
+            if (btn1) btn1.className = screens === '1' ? "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white" : "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted";
+            if (btn2) btn2.className = screens === '2' ? "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white" : "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted";
+            if (btn4) btn4.className = screens === '4' ? "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white" : "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted";
+
+            // Ẩn/hiển thị thanh lựa chọn bố cục phụ tương ứng
+            const subContainer2 = document.getElementById("subMvContainer_2");
+            const subContainer4 = document.getElementById("subMvContainer_4");
+            
+            if (subContainer2) {
+                if (screens === '2') subContainer2.classList.remove("hidden");
+                else subContainer2.classList.add("hidden");
+            }
+            if (subContainer4) {
+                if (screens === '4') subContainer4.classList.remove("hidden");
+                else subContainer4.classList.add("hidden");
+            }
+
+            // Kích hoạt bố cục mặc định cho số lượng màn hình tương ứng
+            if (screens === '1') {
+                setMultiView('1');
+            } else if (screens === '2') {
+                setMultiView('2-horiz');
+            } else if (screens === '4') {
+                setMultiView('4-grid');
+            }
+        }
+
         function setMultiView(format) {
             multiViewFormat = format;
             const grid = document.getElementById("multiviewGrid");
