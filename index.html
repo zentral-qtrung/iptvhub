@@ -182,10 +182,8 @@
         body.cinema-mode-active header,
         body.cinema-mode-active #sidebarSection,
         body.cinema-mode-active #sidebarToggleBtn,
-        body.cinema-mode-active #controlBarInfo,
-        body.cinema-mode-active #epgCurrentBar,
-        body.cinema-mode-active #epgTimelinePanel,
-        body.cinema-mode-active #multiviewSettingsContainer {
+        body.cinema-mode-active #desktopOnlyBars,
+        body.cinema-mode-active #epgTimelinePanel {
             display: none !important;
         }
         body.cinema-mode-active main {
@@ -221,28 +219,28 @@
 </head>
 <body class="bg-[#0a0a0c] text-[#e3e2e6] h-full flex flex-col overflow-hidden antialiased">
 
-    <!-- Header (Premium Top App Bar) -->
-    <header class="bg-surface border-b border-borderColor px-5 py-3 flex flex-col md:flex-row items-center justify-between shrink-0 gap-3 shadow-md z-20">
-        <div class="flex items-center gap-3 w-full md:w-auto">
-            <div class="bg-primary text-white p-2.5 rounded-2xl flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-tv text-md"></i>
+    <!-- Header (Premium Top App Bar - Compact on Mobile) -->
+    <header class="bg-surface border-b border-borderColor px-4 py-2.5 md:px-5 md:py-3 flex flex-row items-center justify-between shrink-0 gap-3 shadow-md z-20">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <div class="bg-primary text-white p-2 md:p-2.5 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-tv text-xs md:text-md"></i>
             </div>
             <div class="min-w-0">
-                <h1 class="text-sm font-extrabold tracking-tight text-main flex items-center gap-1.5">
+                <h1 class="text-xs md:text-sm font-extrabold tracking-tight text-main flex items-center gap-1.5">
                     IPTV Hub 
-                    <span class="text-[9px] bg-primary/20 text-primary-light px-2.5 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1.5">
+                    <span class="text-[8px] md:text-[9px] bg-primary/20 text-primary-light px-2 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1">
                         ULTIMATE PRO
                     </span>
                     <button onclick="toggleAboutModal(true)" class="text-muted hover:text-primary transition p-0.5" title="Thông tin & Bản quyền">
-                        <i class="fa-solid fa-circle-info text-xs"></i>
+                        <i class="fa-solid fa-circle-info text-[10px] md:text-xs"></i>
                     </button>
                 </h1>
-                <p class="text-[10px] text-muted truncate">Trình phát sóng truyền hình tối giản & mượt mà</p>
+                <p class="text-[9px] md:text-[10px] text-muted truncate">Trình phát sóng truyền hình tối giản</p>
             </div>
         </div>
         
-        <!-- Live Calendar (Solar & Lunar) -->
-        <div class="flex items-center bg-variant/50 border border-borderColor rounded-2xl px-4 py-2 gap-3 text-xs w-full md:w-auto justify-center md:justify-start">
+        <!-- Live Calendar (Hidden on mobile to save vertical space) -->
+        <div class="hidden md:flex items-center bg-variant/50 border border-borderColor rounded-2xl px-4 py-2 gap-3 text-xs justify-center">
             <div class="flex items-center gap-1.5 text-primary-light font-extrabold">
                 <i class="fa-regular fa-clock"></i>
                 <span id="txtLiveTime">00:00</span>
@@ -254,22 +252,22 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-            <button onclick="toggleSettingsModal(true)" class="bg-variant hover:bg-variantHover text-main p-2.5 rounded-full transition border border-borderColor flex items-center justify-center w-10 h-10 shrink-0" title="Cài đặt hệ thống">
-                <i class="fa-solid fa-gear"></i>
+        <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="toggleSettingsModal(true)" class="bg-variant hover:bg-variantHover text-main p-2 md:p-2.5 rounded-full transition border border-borderColor flex items-center justify-center w-8 h-8 md:w-10 md:h-10 shrink-0" title="Cài đặt hệ thống">
+                <i class="fa-solid fa-gear text-xs md:text-sm"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative p-3 gap-3">
+    <!-- Main Container (Tight spacing on Mobile) -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative p-1.5 md:p-3 gap-2 md:gap-3">
         
-        <!-- Sidebar: Playlists & Channels -->
-        <section id="sidebarSection" class="w-full md:w-80 lg:w-[320px] bg-surface rounded-2xl border border-borderColor flex flex-col shrink-0 flex-1 md:flex-none md:h-full overflow-hidden shadow-sm z-10 order-2 md:order-1">
+        <!-- Sidebar: Playlists & Channels (Takes remaining space on mobile vertically) -->
+        <section id="sidebarSection" class="w-full md:w-80 lg:w-[320px] bg-surface rounded-xl md:rounded-2xl border border-borderColor flex flex-col shrink-0 flex-1 md:flex-none md:h-full overflow-hidden shadow-sm z-10 order-2 md:order-1">
             
-            <div class="p-3.5 space-y-3 border-b border-borderColor bg-surface shrink-0">
+            <div class="p-2.5 md:p-3.5 space-y-2 md:space-y-3 border-b border-borderColor bg-surface shrink-0">
                 <!-- Dropdown selector -->
-                <div class="bg-variant rounded-xl p-2 border border-borderInput">
+                <div class="bg-variant rounded-lg md:rounded-xl p-1.5 md:p-2 border border-borderInput">
                     <label class="block text-[8px] text-muted font-extrabold mb-0.5 px-1 uppercase tracking-wider">Danh Sách IPTV</label>
                     <div class="flex items-center gap-2">
                         <select id="playlistSelect" onchange="onPlaylistChange()" class="flex-1 bg-transparent text-main text-xs font-bold focus:outline-none cursor-pointer truncate">
@@ -286,31 +284,31 @@
                     </div>
                 </div>
                 
-                <!-- Search -->
+                <!-- Search & Filters in one compact block on mobile if needed, tight margins -->
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted">
                         <i class="fa-solid fa-magnifying-glass text-xs"></i>
                     </span>
-                    <input type="text" id="searchInput" oninput="filterChannels()" placeholder="Tìm kiếm kênh..." class="w-full bg-variant border border-transparent rounded-full pl-9 pr-3 py-2 text-xs text-main placeholder-muted focus:outline-none focus:border-primary focus:bg-surface transition duration-200">
+                    <input type="text" id="searchInput" oninput="filterChannels()" placeholder="Tìm kiếm kênh..." class="w-full bg-variant border border-transparent rounded-full pl-9 pr-3 py-1.5 md:py-2 text-xs text-main placeholder-muted focus:outline-none focus:border-primary focus:bg-surface transition duration-200">
                 </div>
 
-                <!-- Filters -->
+                <!-- Filters row -->
                 <div class="flex gap-1.5">
-                    <div class="flex-1 bg-variant rounded-full px-3 py-1.5 border border-borderInput flex items-center">
-                        <select id="groupSelect" onchange="filterChannels()" class="w-full bg-transparent text-main text-[10px] font-bold focus:outline-none cursor-pointer">
+                    <div class="flex-1 bg-variant rounded-full px-2.5 py-1 md:py-1.5 border border-borderInput flex items-center">
+                        <select id="groupSelect" onchange="filterChannels()" class="w-full bg-transparent text-main text-[9px] md:text-[10px] font-bold focus:outline-none cursor-pointer">
                             <option value="all">Tất cả các nhóm</option>
                         </select>
                     </div>
-                    <button onclick="toggleFavoritesOnly()" id="favToggleBtn" class="bg-variant hover:bg-variantHover text-muted p-2 rounded-full text-xs transition flex items-center justify-center border border-borderInput w-8 h-8 shrink-0" title="Chỉ xem yêu thích">
-                        <i class="fa-solid fa-star"></i>
+                    <button onclick="toggleFavoritesOnly()" id="favToggleBtn" class="bg-variant hover:bg-variantHover text-muted p-1.5 rounded-full text-xs transition flex items-center justify-center border border-borderInput w-7 h-7 md:w-8 md:h-8 shrink-0" title="Chỉ xem yêu thích">
+                        <i class="fa-solid fa-star text-[10px] md:text-xs"></i>
                     </button>
-                    <button id="editModeBtn" onclick="toggleEditMode()" class="bg-variant hover:bg-variantHover text-muted p-2 rounded-full text-xs transition flex items-center justify-center border border-borderInput w-8 h-8 shrink-0" title="Chỉnh sửa">
-                        <i class="fa-solid fa-pen-to-square"></i>
+                    <button id="editModeBtn" onclick="toggleEditMode()" class="bg-variant hover:bg-variantHover text-muted p-1.5 rounded-full text-xs transition flex items-center justify-center border border-borderInput w-7 h-7 md:w-8 md:h-8 shrink-0" title="Chỉnh sửa">
+                        <i class="fa-solid fa-pen-to-square text-[10px] md:text-xs"></i>
                     </button>
                 </div>
 
                 <!-- Admin Action Tools -->
-                <div id="editControlsPanel" class="hidden flex-wrap gap-1.5 pt-2 border-t border-borderColor/40 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div id="editControlsPanel" class="hidden flex-wrap gap-1.5 pt-1.5 border-t border-borderColor/40 animate-in fade-in slide-in-from-top-2 duration-150">
                     <button onclick="sortChannelsAZ()" class="px-2 py-1 bg-variant hover:bg-variantHover border border-borderInput rounded-full text-[9px] font-bold text-main flex-1 flex items-center justify-center gap-1">
                         Sắp xếp A-Z
                     </button>
@@ -323,27 +321,27 @@
                 </div>
             </div>
 
-            <!-- Channels List -->
+            <!-- Channels List (Fills entire screen height below on mobile!) -->
             <div class="flex-1 overflow-y-auto p-2 space-y-1" id="channelList">
                 <div class="text-center py-10 text-muted text-xs">Chưa nạp Playlist. Hãy mở cài đặt để thêm tivi.</div>
             </div>
             
-            <div class="px-4 py-3 bg-footer border-t border-borderColor text-[11px] text-muted flex justify-between items-center shrink-0">
+            <div class="px-3 py-2 md:px-4 md:py-3 bg-footer border-t border-borderColor text-[10px] md:text-[11px] text-muted flex justify-between items-center shrink-0">
                 <span id="channelCount" class="font-bold">Kênh: 0</span>
                 <button onclick="clearAllData()" class="text-red-400 hover:text-red-300 font-extrabold tracking-wide transition">XÓA BỘ NHỚ</button>
             </div>
         </section>
 
-        <!-- Toggle Collapse Side Bar -->
+        <!-- Toggle Collapse Side Bar (Desktop Only) -->
         <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="hidden md:flex absolute left-[320px] top-[48%] -translate-y-1/2 z-30 w-5 h-10 bg-surface hover:bg-variantHover border border-borderColor text-main rounded-full items-center justify-center shadow-lg transition duration-200" style="margin-left: -10px;">
             <i id="sidebarToggleIcon" class="fa-solid fa-chevron-left text-[10px]"></i>
         </button>
 
-        <!-- Player Workspace -->
-        <section class="w-full md:w-auto flex-none md:flex-1 flex flex-col bg-surface rounded-2xl border border-borderColor h-[35vh] md:h-full overflow-hidden shadow-sm relative stage-container z-0 order-1 md:order-2">
+        <!-- Player Workspace (Fixed top ratio on mobile, full-size flex on desktop) -->
+        <section class="w-full md:w-auto flex-none md:flex-1 flex flex-col bg-surface rounded-xl md:rounded-2xl border border-borderColor overflow-hidden shadow-sm relative stage-container z-0 order-1 md:order-2">
             
-            <!-- Video Frame Container -->
-            <div class="flex-1 relative bg-black overflow-hidden">
+            <!-- Video Frame Container (Strict Aspect-Ratio on mobile to protect layout) -->
+            <div class="relative bg-black overflow-hidden aspect-video w-full md:flex-1 md:aspect-auto">
                 <div id="multiviewGrid" class="multiview-grid grid-cols-1">
                     
                     <!-- Slot 0 -->
@@ -397,16 +395,16 @@
                 </div>
                 
                 <!-- Placeholder Screen -->
-                <div id="playerPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-center p-5 z-10">
-                    <div class="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-3">
-                        <i class="fa-solid fa-clapperboard text-2xl animate-pulse"></i>
+                <div id="playerPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-center p-4 z-10">
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-2 md:mb-3">
+                        <i class="fa-solid fa-clapperboard text-xl md:text-2xl animate-pulse"></i>
                     </div>
-                    <h3 class="text-sm font-extrabold text-white">Chưa Chọn Kênh Phát</h3>
-                    <p class="text-[11px] text-muted max-w-xs mt-1">Chọn kênh bất kỳ ở cột bên trái để bắt đầu trình phát. <br>Nếu không hãy thêm playlist mới trong "Cài Đặt"</br> </p>
+                    <h3 class="text-xs md:text-sm font-extrabold text-white">Chưa Chọn Kênh Phát</h3>
+                    <p class="text-[10px] md:text-[11px] text-muted max-w-[200px] md:max-w-xs mt-1">Chọn kênh bất kỳ ở cột bên trái để bắt đầu trình phát.</p>
                 </div>
 
                 <!-- Custom Overlay Playbar controls -->
-                <div id="customControls" class="absolute bottom-3 left-3 right-3 bg-black/75 backdrop-blur-md border border-borderColor rounded-xl p-2.5 flex flex-col gap-2 opacity-0 hover:opacity-100 transition-opacity duration-300 z-30">
+                <div id="customControls" class="absolute bottom-2 left-2 right-2 md:bottom-3 md:left-3 md:right-3 bg-black/85 backdrop-blur-md border border-borderColor rounded-xl p-2 md:p-2.5 flex flex-col gap-2 opacity-0 hover:opacity-100 transition-opacity duration-300 z-30">
                     <!-- Progress for VOD -->
                     <div id="vodProgressContainer" class="hidden flex items-center gap-2 px-1">
                         <span id="vodCurrentTime" class="text-[9px] text-muted font-bold">00:00:00</span>
@@ -415,24 +413,28 @@
                     </div>
 
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <button id="ctrlPlayBtn" onclick="togglePlayPause()" class="w-7 h-7 bg-primary hover:bg-primary-hover text-white rounded-full flex items-center justify-center transition">
-                                <i class="fa-solid fa-pause text-[10px]"></i>
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <button id="ctrlPlayBtn" onclick="togglePlayPause()" class="w-6 h-6 md:w-7 md:h-7 bg-primary hover:bg-primary-hover text-white rounded-full flex items-center justify-center transition">
+                                <i class="fa-solid fa-pause text-[8px] md:text-[10px]"></i>
                             </button>
                             <div class="flex items-center gap-1">
                                 <button id="ctrlMuteBtn" onclick="toggleMute()" class="text-white hover:text-primary p-1 text-xs">
-                                    <i class="fa-solid fa-volume-xmark text-[10px]"></i>
+                                    <i class="fa-solid fa-volume-xmark text-[9px] md:text-[10px]"></i>
                                 </button>
-                                <input type="range" id="ctrlVolumeSlider" oninput="onVolumeSliderChange()" min="0" max="1" step="0.1" value="1" class="w-14 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-primary">
+                                <input type="range" id="ctrlVolumeSlider" oninput="onVolumeSliderChange()" min="0" max="1" step="0.1" value="1" class="w-10 md:w-14 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-primary">
                             </div>
-                            <div class="flex items-center gap-1.5 text-[9px] bg-variant/60 rounded-full px-2 py-0.5 text-muted font-semibold">
-                                <div id="liveStatusDot" class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                                <span id="liveStatusText" class="text-green-400">TRỰC TIẾP</span>
-                                <span id="controlDuration"></span>
+                            <div class="flex items-center gap-1 text-[8px] md:text-[9px] bg-variant/60 rounded-full px-2 py-0.5 text-muted font-semibold">
+                                <div id="liveStatusDot" class="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-green-500"></div>
+                                <span id="liveStatusText" class="text-green-400">LIVE</span>
+                                <span id="controlDuration" class="hidden md:inline"></span>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1 md:gap-1.5">
+                            <!-- Mobile-friendly quick reload button in overlay -->
+                            <button onclick="retryPlayback()" class="bg-variant hover:bg-variantHover text-main p-1.5 rounded-lg text-xs transition" title="Tải lại luồng">
+                                <i class="fa-solid fa-rotate-right text-[10px]"></i>
+                            </button>
                             <button id="ctrlCinemaBtn" onclick="toggleCinemaMode()" class="bg-variant hover:bg-variantHover text-main p-1.5 rounded-lg text-xs transition" title="Rạp phim">
                                 <i class="fa-solid fa-lightbulb text-[10px]"></i>
                             </button>
@@ -447,83 +449,86 @@
                 </div>
 
                 <!-- HUD Info popup -->
-                <div id="channelHud" class="absolute bottom-5 left-5 right-5 bg-[#121215]/80 backdrop-blur-md border border-primary/25 rounded-2xl p-3 flex items-center justify-between gap-4 z-20 opacity-0 translate-y-6 pointer-events-none transition-all duration-300">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                        <img id="hudLogo" src="" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant p-1 shrink-0">
+                <div id="channelHud" class="absolute bottom-4 left-4 right-4 bg-[#121215]/85 backdrop-blur-md border border-primary/25 rounded-xl p-2.5 flex items-center justify-between gap-3 z-20 opacity-0 translate-y-6 pointer-events-none transition-all duration-300">
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <img id="hudLogo" src="" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-8 h-8 rounded-lg object-contain bg-variant p-1 shrink-0">
                         <div class="min-w-0 flex-1">
-                            <h4 id="hudChannelName" class="font-extrabold text-white text-sm truncate">Tên kênh</h4>
+                            <h4 id="hudChannelName" class="font-extrabold text-white text-xs truncate">Tên kênh</h4>
                             <div class="flex items-center gap-2 mt-0.5 min-w-0">
-                                <span class="text-[8px] bg-primary text-white font-extrabold px-1.5 py-0.5 rounded-full">ĐANG PHÁT</span>
-                                <span id="hudProgramTitle" class="text-[11px] text-primary-light font-bold truncate">Lịch chiếu...</span>
+                                <span class="text-[7px] bg-primary text-white font-extrabold px-1 py-0.5 rounded-full">ĐANG PHÁT</span>
+                                <span id="hudProgramTitle" class="text-[10px] text-primary-light font-bold truncate">Lịch chiếu...</span>
                             </div>
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <span id="hudProgramTime" class="text-[10px] text-muted font-bold block">00:00 - 00:00</span>
+                        <span id="hudProgramTime" class="text-[8px] text-muted font-bold block">00:00 - 00:00</span>
                     </div>
                 </div>
             </div>
 
-            <!-- EPG current bar -->
-            <div id="epgCurrentBar" class="hidden bg-variant border-t border-borderColor px-4 py-2 text-xs flex items-center justify-between gap-4">
-                <div class="flex items-center gap-2 min-w-0">
-                    <span class="bg-primary text-white font-extrabold px-1.5 py-0.5 rounded text-[8px]">ĐANG CHIẾU</span>
-                    <span id="epgCurrentTitle" class="text-main font-bold truncate">Đang tải lịch phát sóng...</span>
-                </div>
-                <div class="flex items-center gap-3 shrink-0">
-                    <span id="epgCurrentTime" class="text-muted font-semibold">00:00 - 00:00</span>
-                </div>
-            </div>
-
-            <!-- Footer control bar and info -->
-            <div id="controlBarInfo" class="bg-surface border-t border-borderColor p-3 shrink-0 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 z-10">
-                <div class="flex items-center gap-3 min-w-0">
-                    <img id="currentLogo" src="https://placehold.co/80x80/252529/d0bcff?text=TV" onerror="this.src='https://placehold.co/80x80/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant border border-borderInput p-1 shrink-0" alt="Logo">
-                    <div class="min-w-0">
-                        <h2 id="currentTitle" class="font-bold text-main text-sm truncate">Chưa chọn kênh phát</h2>
-                        <p id="currentGroup" class="text-[10px] text-muted mt-0.5">Chọn một kênh bên trái để bắt đầu</p>
+            <!-- DESKTOP-ONLY DYNAMIC BARS CONTAINER (Completely hidden on Mobile to free vertical space!) -->
+            <div id="desktopOnlyBars" class="hidden md:flex flex-col shrink-0 z-10">
+                <!-- EPG current bar -->
+                <div id="epgCurrentBar" class="hidden bg-variant border-t border-borderColor px-4 py-2 text-xs flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="bg-primary text-white font-extrabold px-1.5 py-0.5 rounded text-[8px]">ĐANG CHIẾU</span>
+                        <span id="epgCurrentTitle" class="text-main font-bold truncate">Đang tải lịch phát sóng...</span>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span id="epgCurrentTime" class="text-muted font-semibold">00:00 - 00:00</span>
                     </div>
                 </div>
-                
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <button id="showEpgTimelineBtn" onclick="toggleEpgTimeline()" class="bg-variant hover:bg-variantHover text-main px-3.5 py-2 border border-borderInput rounded-full transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-list-ul text-[10px] text-primary"></i> <span class="text-[11px] font-bold">Lịch chiếu</span>
-                    </button>
-                    <button id="favoriteBtn" onclick="toggleCurrentFavorite()" class="bg-variant hover:bg-variantHover text-muted p-2 rounded-full transition border border-borderInput w-9 h-9 flex items-center justify-center" title="Yêu thích">
-                        <i class="fa-solid fa-star text-xs"></i>
-                    </button>
-                    <button onclick="retryPlayback()" class="bg-variant hover:bg-variantHover text-main p-2 rounded-full transition border border-borderInput w-9 h-9 flex items-center justify-center" title="Tải lại luồng">
-                        <i class="fa-solid fa-rotate-right text-xs"></i>
+
+                <!-- Footer control bar and info -->
+                <div id="controlBarInfo" class="bg-surface border-t border-borderColor p-3 shrink-0 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <img id="currentLogo" src="https://placehold.co/80x80/252529/d0bcff?text=TV" onerror="this.src='https://placehold.co/80x80/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant border border-borderInput p-1 shrink-0" alt="Logo">
+                        <div class="min-w-0">
+                            <h2 id="currentTitle" class="font-bold text-main text-sm truncate">Chưa chọn kênh phát</h2>
+                            <p id="currentGroup" class="text-[10px] text-muted mt-0.5">Chọn một kênh bên trái để bắt đầu</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button id="showEpgTimelineBtn" onclick="toggleEpgTimeline()" class="bg-variant hover:bg-variantHover text-main px-3.5 py-2 border border-borderInput rounded-full transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-ul text-[10px] text-primary"></i> <span class="text-[11px] font-bold">Lịch chiếu</span>
+                        </button>
+                        <button id="favoriteBtn" onclick="toggleCurrentFavorite()" class="bg-variant hover:bg-variantHover text-muted p-2 rounded-full transition border border-borderInput w-9 h-9 flex items-center justify-center" title="Yêu thích">
+                            <i class="fa-solid fa-star text-xs"></i>
+                        </button>
+                        <button onclick="retryPlayback()" class="bg-variant hover:bg-variantHover text-main p-2 rounded-full transition border border-borderInput w-9 h-9 flex items-center justify-center" title="Tải lại luồng">
+                            <i class="fa-solid fa-rotate-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Embedded Multiview Bar under playbar -->
+                <div id="multiviewSettingsContainer" class="bg-footer border-t border-borderColor px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[9px] font-extrabold text-muted uppercase tracking-wider mr-1">Đa Màn Hình:</span>
+                        <button id="primaryMvBtn_1" onclick="selectPrimaryMultiView('1')" class="px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white">1 Màn</button>
+                        <button id="primaryMvBtn_2" onclick="selectPrimaryMultiView('2')" class="px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted">2 Màn</button>
+                        <button id="primaryMvBtn_4" onclick="selectPrimaryMultiView('4')" class="px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted">4 Màn</button>
+                    </div>
+
+                    <!-- Sub layout buttons (hidden by default) -->
+                    <div id="subMvContainer_2" class="hidden flex items-center gap-1">
+                        <button id="mvBtn_2-horiz" onclick="setMultiView('2-horiz')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-primary text-white">Song Song</button>
+                        <button id="mvBtn_2-vert" onclick="setMultiView('2-vert')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-variant border border-borderInput text-muted hover:text-main">Trên Dưới</button>
+                    </div>
+                    <div id="subMvContainer_4" class="hidden flex items-center gap-1">
+                        <button id="mvBtn_4-grid" onclick="setMultiView('4-grid')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-primary text-white">Lưới 2x2</button>
+                        <button id="mvBtn_4-1-3" onclick="setMultiView('4-1-3')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-variant border border-borderInput text-muted hover:text-main">1 Lớn & 3 Nhỏ (1:3)</button>
+                    </div>
+
+                    <button onclick="stopAllPlaybacks()" class="px-3 py-1 bg-red-950/30 hover:bg-red-900/50 text-red-400 border border-red-900/20 text-[9px] font-extrabold rounded-full transition uppercase tracking-wider">
+                        Tắt tất cả
                     </button>
                 </div>
             </div>
 
-            <!-- Embedded Multiview Bar under playbar -->
-            <div id="multiviewSettingsContainer" class="bg-footer border-t border-borderColor px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5 z-10">
-                <div class="flex items-center gap-1.5">
-                    <span class="text-[9px] font-extrabold text-muted uppercase tracking-wider mr-1">Đa Màn Hình:</span>
-                    <button id="primaryMvBtn_1" onclick="selectPrimaryMultiView('1')" class="px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white">1 Màn</button>
-                    <button id="primaryMvBtn_2" onclick="selectPrimaryMultiView('2')" class="px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted">2 Màn</button>
-                    <button id="primaryMvBtn_4" onclick="selectPrimaryMultiView('4')" class="px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted">4 Màn</button>
-                </div>
-
-                <!-- Sub layout buttons (hidden by default) -->
-                <div id="subMvContainer_2" class="hidden flex items-center gap-1">
-                    <button id="mvBtn_2-horiz" onclick="setMultiView('2-horiz')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-primary text-white">Song Song</button>
-                    <button id="mvBtn_2-vert" onclick="setMultiView('2-vert')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-variant border border-borderInput text-muted hover:text-main">Trên Dưới</button>
-                </div>
-                <div id="subMvContainer_4" class="hidden flex items-center gap-1">
-                    <button id="mvBtn_4-grid" onclick="setMultiView('4-grid')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-primary text-white">Lưới 2x2</button>
-                    <button id="mvBtn_4-1-3" onclick="setMultiView('4-1-3')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition bg-variant border border-borderInput text-muted hover:text-main">1 Lớn & 3 Nhỏ (1:3)</button>
-                </div>
-
-                <button onclick="stopAllPlaybacks()" class="px-3 py-1 bg-red-950/30 hover:bg-red-900/50 text-red-400 border border-red-900/20 text-[9px] font-extrabold rounded-full transition uppercase tracking-wider">
-                    Tắt tất cả
-                </button>
-            </div>
-
-            <!-- Timeline list expandable bottom panel -->
-            <div id="epgTimelinePanel" class="hidden bg-[#101012] border-t border-borderColor h-48 overflow-y-auto flex-col shrink-0 z-10">
+            <!-- Timeline list expandable bottom panel (Desktop Only) -->
+            <div id="epgTimelinePanel" class="hidden md:hidden bg-[#101012] border-t border-borderColor h-48 overflow-y-auto flex-col shrink-0 z-10">
                 <div class="px-4 py-2 border-b border-borderColor/35 bg-surface sticky top-0 flex justify-between items-center z-10">
                     <span class="text-[9px] font-extrabold text-primary-light uppercase tracking-wider">Danh sách chương trình sắp chiếu</span>
                     <button onclick="toggleEpgTimeline(false)" class="text-muted hover:text-main transition text-xs font-bold flex items-center gap-0.5">
@@ -591,7 +596,7 @@
             </div>
 
             <div class="px-5 py-3.5 bg-dialogFooter border-t border-borderColor/50 flex items-center justify-between">
-                <span class="text-[8px] font-extrabold tracking-wider text-muted"> DEVELOPED BY <span class="text-primary">GEMINI<br>Một sản phẩm vibe coding</br> </span></span>
+                <span class="text-[8px] font-extrabold tracking-wider text-muted font-sans"> DEVELOPED BY <span class="text-primary font-bold">GEMINI</span></span>
                 <button onclick="toggleSettingsModal(false)" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-full transition shadow-md">Đồng ý</button>
             </div>
         </div>
@@ -855,12 +860,16 @@
             const now = new Date();
             const hour = String(now.getHours()).padStart(2, '0');
             const minute = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById("txtLiveTime").textContent = `${hour}:${minute}`;
+            
+            const liveTimeEl = document.getElementById("txtLiveTime");
+            if (liveTimeEl) liveTimeEl.textContent = `${hour}:${minute}`;
 
             const day = now.getDate();
             const month = now.getMonth() + 1;
             const year = now.getFullYear();
-            document.getElementById("txtSolarDate").textContent = `Ngày ${day} tháng ${month} năm ${year}`;
+            
+            const solarDateEl = document.getElementById("txtSolarDate");
+            if (solarDateEl) solarDateEl.textContent = `Ngày ${day} tháng ${month} năm ${year}`;
 
             const lunarDay = day; 
             const lunarMonth = month;
@@ -868,7 +877,8 @@
             const chi = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
             const lunarYearName = `${can[(year - 4) % 10]} ${chi[(year - 4) % 12]}`;
 
-            document.getElementById("txtLunarDate").textContent = `Âm lịch: Ngày ${lunarDay}/${lunarMonth} (Năm ${lunarYearName})`;
+            const lunarDateEl = document.getElementById("txtLunarDate");
+            if (lunarDateEl) lunarDateEl.textContent = `Âm lịch: Ngày ${lunarDay}/${lunarMonth} (Năm ${lunarYearName})`;
         }
 
         // --- 3. KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB (WITH SAFE PREVIEW CAPABILITIES) ---
@@ -898,7 +908,7 @@
                     request.onerror = (e) => {
                         console.warn("Không thể mở IndexedDB (Thường gặp trong Iframe Sandbox). Chuyển sang LocalStorage dự phòng.");
                         isLocalStorageFallback = true;
-                        resolve(null); // Giải phóng onload, không block hệ thống
+                        resolve(null);
                     };
                 } catch (err) {
                     console.warn("Bảo mật Sandbox chặn khởi tạo DB. Dùng LocalStorage dự phòng.");
@@ -1453,7 +1463,6 @@
                         localStorage.setItem("fallback_epg", JSON.stringify(fallbackEpg));
                         resolve();
                     } catch (e) {
-                        // Nếu đầy bộ nhớ local, giữ trên RAM hiện tại
                         console.warn("EPG vượt hạn mức bộ nhớ cục bộ, hệ thống sẽ lưu tạm thời.");
                         resolve();
                     }
@@ -1526,9 +1535,14 @@
         function initEpgUI() {
             const lastUpdate = localStorage.getItem("iptv_epg_last_update");
             const sourceUrl = localStorage.getItem("iptv_epg_source_url") || "Chưa cài đặt";
-            document.getElementById("lblEpgSource").textContent = sourceUrl;
-            document.getElementById("lblEpgLastUpdate").textContent = lastUpdate ? new Date(parseInt(lastUpdate, 10)).toLocaleString() : "Chưa rõ";
-            document.getElementById("lblEpgChannelsCount").textContent = Object.keys(epgChannelsMap).length;
+            const sourceUrlEl = document.getElementById("lblEpgSource");
+            if (sourceUrlEl) sourceUrlEl.textContent = sourceUrl;
+            
+            const lastUpdateEl = document.getElementById("lblEpgLastUpdate");
+            if (lastUpdateEl) lastUpdateEl.textContent = lastUpdate ? new Date(parseInt(lastUpdate, 10)).toLocaleString() : "Chưa rõ";
+            
+            const channelsCountEl = document.getElementById("lblEpgChannelsCount");
+            if (channelsCountEl) channelsCountEl.textContent = Object.keys(epgChannelsMap).length;
         }
 
         async function deleteEpgData() {
@@ -1582,7 +1596,7 @@
                 return matchesSearch && matchesGroup && matchesFav && matchesHidden;
             });
 
-            // Performance Guard: Giới hạn DOM vẽ để tránh lag lag trên điện thoại / TV cấu hình thấp
+            // Performance Guard
             const MAX_DISPLAY = 150;
             const displayed = filtered.slice(0, MAX_DISPLAY);
 
@@ -1611,9 +1625,9 @@
                     const pct = Math.max(0, Math.min(100, (elapsed / totalDur) * 100));
 
                     epgSectionHtml = `
-                        <div class="mt-1.5 flex flex-col gap-0.5 min-w-0">
-                            <span class="text-primary text-[9px] truncate font-bold flex items-center gap-1">
-                                <i class="fa-regular fa-clock"></i> ${startStr} - ${stopStr} • ${currentProg.title}
+                        <div class="mt-1 flex flex-col gap-0.5 min-w-0">
+                            <span class="text-primary text-[8px] md:text-[9px] truncate font-bold flex items-center gap-1">
+                                <i class="fa-regular fa-clock text-[8px]"></i> ${startStr} - ${stopStr} • ${currentProg.title}
                             </span>
                             <div class="w-full bg-borderInput/30 rounded-full h-1 overflow-hidden">
                                 <div class="bg-primary h-full" style="width: ${pct}%"></div>
@@ -1643,7 +1657,7 @@
                 }
 
                 const div = document.createElement("div");
-                div.className = `channel-item group flex flex-col p-2 rounded-xl transition border ${isPlaying ? 'bg-cardActive border-primary/45 shadow-sm' : 'hover:bg-variant border-transparent'} ${isHidden ? 'opacity-40' : ''}`;
+                div.className = `channel-item group flex flex-col p-1.5 md:p-2 rounded-xl transition border ${isPlaying ? 'bg-cardActive border-primary/45 shadow-sm' : 'hover:bg-variant border-transparent'} ${isHidden ? 'opacity-40' : ''}`;
                 div.setAttribute("tabindex", "0");
                 div.onclick = (e) => {
                     if (e.target.closest('button')) return;
@@ -1653,10 +1667,10 @@
                 div.innerHTML = `
                     <div class="flex items-center justify-between min-w-0">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
-                            <img src="${chan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-8 h-8 rounded-lg object-contain bg-variant border border-borderInput p-1 shrink-0">
+                            <img src="${chan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-7 h-7 md:w-8 md:h-8 rounded-lg object-contain bg-variant border border-borderInput p-1 shrink-0">
                             <div class="min-w-0 flex-1">
                                 <h4 class="text-xs font-bold text-main truncate ${isPlaying ? 'text-primary' : ''}">${chan.name}</h4>
-                                <p class="text-[9px] text-muted font-bold mt-0.5 truncate">${chan.group}</p>
+                                <p class="text-[8px] md:text-[9px] text-muted font-bold mt-0.5 truncate">${chan.group}</p>
                             </div>
                         </div>
                         <button class="text-muted hover:text-yellow-500 p-1 transition" onclick="toggleFavorite('${chanKey}')">
@@ -1671,7 +1685,7 @@
 
             if (filtered.length > MAX_DISPLAY) {
                 const hintDiv = document.createElement("div");
-                hintDiv.className = "text-center py-3 text-muted text-[10px] italic border-t border-borderColor/20 mt-2 shrink-0";
+                hintDiv.className = "text-center py-2 text-muted text-[9px] md:text-[10px] italic border-t border-borderColor/20 mt-1 shrink-0";
                 hintDiv.textContent = `Chỉ hiển thị ${MAX_DISPLAY} kênh đầu tiên. Hãy dùng thanh tìm kiếm để lọc tiếp.`;
                 listContainer.appendChild(hintDiv);
             }
@@ -1740,9 +1754,13 @@
             }
 
             if (activeSlotIndex === 0 || !multiViewActive) {
-                document.getElementById("currentTitle").textContent = chan.name;
-                document.getElementById("currentGroup").textContent = chan.group;
-                document.getElementById("currentLogo").src = chan.logo || '';
+                const currentTitleEl = document.getElementById("currentTitle");
+                const currentGroupEl = document.getElementById("currentGroup");
+                const currentLogoEl = document.getElementById("currentLogo");
+                
+                if (currentTitleEl) currentTitleEl.textContent = chan.name;
+                if (currentGroupEl) currentGroupEl.textContent = chan.group;
+                if (currentLogoEl) currentLogoEl.src = chan.logo || '';
             }
 
             if (players[activeSlotIndex]) {
@@ -1828,14 +1846,12 @@
             video.volume = parseFloat(slider.value);
         }
 
-        // Picture-in-Picture
         function togglePip() {
             const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
             if (document.pictureInPictureElement) document.exitPictureInPicture();
             else video.requestPictureInPicture().catch(() => showToast("Lỗi mở PIP", "error"));
         }
 
-        // Toàn màn hình
         function toggleFullscreen() {
             const container = document.getElementById("videoPlayer" + activeSlotIndex);
             if (document.fullscreenElement) document.exitFullscreen();
@@ -1862,6 +1878,7 @@
 
         function updateFavBtnUI() {
             const btn = document.getElementById("favoriteBtn");
+            if (!btn) return;
             const activeChan = currentActiveChannels[activeSlotIndex];
             if (!activeChan) return;
             const key = getChannelKey(activeChan);
@@ -1962,11 +1979,11 @@
             if (shouldShow) {
                 panel.classList.remove("hidden");
                 panel.classList.add("flex");
-                btn.classList.add("bg-primary/10", "text-primary", "border-primary/30");
+                if (btn) btn.classList.add("bg-primary/10", "text-primary", "border-primary/30");
             } else {
                 panel.classList.add("hidden");
                 panel.classList.remove("flex");
-                btn.classList.remove("bg-primary/10", "text-primary", "border-primary/30");
+                if (btn) btn.classList.remove("bg-primary/10", "text-primary", "border-primary/30");
             }
         }
 
@@ -2077,15 +2094,15 @@
             const durationLabel = document.getElementById("controlDuration");
 
             if (video && !isNaN(video.duration) && video.duration !== Infinity && video.duration > 0) {
-                progressContainer.classList.remove("hidden");
-                liveStatusDot.classList.add("hidden");
-                liveStatusText.classList.add("hidden");
-                durationLabel.textContent = "Chế độ VOD";
+                if (progressContainer) progressContainer.classList.remove("hidden");
+                if (liveStatusDot) liveStatusDot.classList.add("hidden");
+                if (liveStatusText) liveStatusText.classList.add("hidden");
+                if (durationLabel) durationLabel.textContent = "VOD";
             } else {
-                progressContainer.classList.add("hidden");
-                liveStatusDot.classList.remove("hidden");
-                liveStatusText.classList.remove("hidden");
-                durationLabel.textContent = "Luồng phát trực tiếp";
+                if (progressContainer) progressContainer.classList.add("hidden");
+                if (liveStatusDot) liveStatusDot.classList.remove("hidden");
+                if (liveStatusText) liveStatusText.classList.remove("hidden");
+                if (durationLabel) durationLabel.textContent = "LIVE";
             }
         }
 
@@ -2097,9 +2114,9 @@
             if (video && !isNaN(video.duration) && video.duration !== Infinity) {
                 const current = video.currentTime;
                 const total = video.duration;
-                progressBar.value = (current / total) * 100;
-                currentLabel.textContent = formatTime(current);
-                totalLabel.textContent = formatTime(total);
+                if (progressBar) progressBar.value = (current / total) * 100;
+                if (currentLabel) currentLabel.textContent = formatTime(current);
+                if (totalLabel) totalLabel.textContent = formatTime(total);
             }
         }
 
@@ -2159,7 +2176,6 @@
         }
 
         function selectPrimaryMultiView(screens) {
-            // Cập nhật trạng thái active trực quan cho nút chính
             const btn1 = document.getElementById("primaryMvBtn_1");
             const btn2 = document.getElementById("primaryMvBtn_2");
             const btn4 = document.getElementById("primaryMvBtn_4");
@@ -2168,7 +2184,6 @@
             if (btn2) btn2.className = screens === '2' ? "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white" : "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted";
             if (btn4) btn4.className = screens === '4' ? "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-primary text-white" : "px-3 py-1 rounded-full text-[9px] font-extrabold transition bg-transparent text-muted";
 
-            // Ẩn/hiển thị thanh lựa chọn bố cục phụ tương ứng
             const subContainer2 = document.getElementById("subMvContainer_2");
             const subContainer4 = document.getElementById("subMvContainer_4");
             
@@ -2181,7 +2196,6 @@
                 else subContainer4.classList.add("hidden");
             }
 
-            // Kích hoạt bố cục mặc định cho số lượng màn hình tương ứng
             if (screens === '1') {
                 setMultiView('1');
             } else if (screens === '2') {
@@ -2303,27 +2317,38 @@
             }
 
             const activeChan = currentActiveChannels[activeSlotIndex];
+            const currentTitleEl = document.getElementById("currentTitle");
+            const currentGroupEl = document.getElementById("currentGroup");
+            const currentLogoEl = document.getElementById("currentLogo");
+
             if (activeChan) {
-                document.getElementById("currentTitle").textContent = activeChan.name;
-                document.getElementById("currentGroup").textContent = activeChan.group;
-                document.getElementById("currentLogo").src = activeChan.logo || '';
+                if (currentTitleEl) currentTitleEl.textContent = activeChan.name;
+                if (currentGroupEl) currentGroupEl.textContent = activeChan.group;
+                if (currentLogoEl) currentLogoEl.src = activeChan.logo || '';
                 updateFavBtnUI();
                 updateCurrentEpgDisplay();
                 updateControlsSeekbar(activeSlotIndex);
             } else {
-                document.getElementById("currentTitle").textContent = "Chưa chọn kênh phát";
-                document.getElementById("currentGroup").textContent = "Chọn một kênh bất kỳ bên trái để tải vào đây";
-                document.getElementById("currentLogo").src = 'https://placehold.co/80x80/252529/d0bcff?text=TV';
+                if (currentTitleEl) currentTitleEl.textContent = "Chưa chọn kênh phát";
+                if (currentGroupEl) currentGroupEl.textContent = "Chọn một kênh bất kỳ bên trái";
+                if (currentLogoEl) currentLogoEl.src = 'https://placehold.co/80x80/252529/d0bcff?text=TV';
             }
         }
 
         function stopAllPlaybacks() {
             for (let i = 0; i < 4; i++) { stopSlotPlayback(i); }
             document.getElementById("playerPlaceholder").classList.remove("hidden");
-            document.getElementById("currentTitle").textContent = "Chưa chọn kênh phát";
-            document.getElementById("currentGroup").textContent = "Chọn một kênh bất kỳ bên trái";
-            document.getElementById("currentLogo").src = 'https://placehold.co/80x80/252529/d0bcff?text=TV';
-            document.getElementById("epgCurrentBar").classList.add("hidden");
+            
+            const currentTitleEl = document.getElementById("currentTitle");
+            const currentGroupEl = document.getElementById("currentGroup");
+            const currentLogoEl = document.getElementById("currentLogo");
+            const epgBar = document.getElementById("epgCurrentBar");
+            
+            if (currentTitleEl) currentTitleEl.textContent = "Chưa chọn kênh phát";
+            if (currentGroupEl) currentGroupEl.textContent = "Chọn một kênh bất kỳ bên trái";
+            if (currentLogoEl) currentLogoEl.src = 'https://placehold.co/80x80/252529/d0bcff?text=TV';
+            if (epgBar) epgBar.classList.add("hidden");
+            
             document.getElementById("epgTimelinePanel").classList.add("hidden");
             showToast("Đã dừng tất cả trình phát.", "success");
         }
@@ -2363,22 +2388,24 @@
         function updateCurrentEpgDisplay() {
             const epgBar = document.getElementById("epgCurrentBar");
             const activeChan = currentActiveChannels[activeSlotIndex];
-            if (!activeChan) { epgBar.classList.add("hidden"); return; }
+            if (!activeChan) { if (epgBar) epgBar.classList.add("hidden"); return; }
 
             const programs = getChannelEpgPrograms(activeChan);
             const activeProg = getActiveProgram(programs);
 
             if (!activeProg) {
-                epgBar.classList.add("hidden");
+                if (epgBar) epgBar.classList.add("hidden");
                 document.getElementById("epgTimelineList").innerHTML = `<div class="text-center py-6 text-muted text-xs">Không có lịch chiếu hôm nay cho kênh này.</div>`;
                 return;
             }
 
-            epgBar.classList.remove("hidden");
-            document.getElementById("epgCurrentTitle").textContent = activeProg.title;
-            const startTime = new Date(activeProg.start).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
-            const stopTime = new Date(activeProg.stop).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
-            document.getElementById("epgCurrentTime").textContent = `${startTime} - ${stopTime}`;
+            if (epgBar) {
+                epgBar.classList.remove("hidden");
+                document.getElementById("epgCurrentTitle").textContent = activeProg.title;
+                const startTime = new Date(activeProg.start).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                const stopTime = new Date(activeProg.stop).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                document.getElementById("epgCurrentTime").textContent = `${startTime} - ${stopTime}`;
+            }
 
             renderFullTimeline(programs, activeProg);
         }
