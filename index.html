@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPTV Hub Pro</title>
-    <link rel="icon" type="image/png" href="tv.png">
+    <link class="js-favicon" rel="icon" type="image/png" href="tv.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Cấu hình Tailwind để nhận diện các biến màu CSS động
         tailwind.config = {
             theme: {
                 extend: {
@@ -299,8 +298,14 @@
                 <i class="fa-solid fa-tv text-md"></i>
             </div>
             <div class="min-w-0">
-                <h1 class="text-sm font-extrabold tracking-tight text-main flex items-center gap-2">
-                    IPTV Hub <span class="text-[9px] bg-primary/20 text-primary-light px-2.5 py-0.5 rounded-full font-extrabold tracking-widest">ULTIMATE PRO</span>
+                <h1 class="text-sm font-extrabold tracking-tight text-main flex items-center gap-1.5">
+                    IPTV Hub 
+                    <span class="text-[9px] bg-primary/20 text-primary-light px-2.5 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1.5">
+                        ULTIMATE PRO
+                    </span>
+                    <button onclick="toggleAboutModal(true)" class="text-muted hover:text-primary transition p-0.5" title="Thông tin & Bản quyền">
+                        <i class="fa-solid fa-circle-info text-xs"></i>
+                    </button>
                 </h1>
                 <p class="text-[10px] text-muted truncate">Trình phát sóng truyền hình tối giản & mượt mà</p>
             </div>
@@ -330,9 +335,9 @@
     <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative p-3 gap-3">
         
         <!-- Sidebar: Playlists & Channels -->
-        <section id="sidebarSection" class="w-full md:w-80 lg:w-[320px] bg-surface rounded-2xl border border-borderColor flex flex-col shrink-0 h-[45%] md:h-full overflow-hidden shadow-sm z-10">
+        <section id="sidebarSection" class="w-full md:w-80 lg:w-[320px] bg-surface rounded-2xl border border-borderColor flex flex-col shrink-0 flex-1 md:flex-none md:h-full overflow-hidden shadow-sm z-10 order-2 md:order-1">
             
-            <div class="p-3.5 space-y-3 border-b border-borderColor bg-surface">
+            <div class="p-3.5 space-y-3 border-b border-borderColor bg-surface shrink-0">
                 <!-- Dropdown selector -->
                 <div class="bg-variant rounded-xl p-2 border border-borderInput">
                     <label class="block text-[8px] text-muted font-extrabold mb-0.5 px-1 uppercase tracking-wider">Danh Sách IPTV</label>
@@ -405,7 +410,7 @@
         </button>
 
         <!-- Player Workspace -->
-        <section class="flex-1 flex flex-col bg-surface rounded-2xl border border-borderColor h-[55%] md:h-full overflow-hidden shadow-sm relative stage-container z-0">
+        <section class="w-full md:w-auto flex-none md:flex-1 flex flex-col bg-surface rounded-2xl border border-borderColor h-[35vh] md:h-full overflow-hidden shadow-sm relative stage-container z-0 order-1 md:order-2">
             
             <!-- Video Frame Container -->
             <div class="flex-1 relative bg-black overflow-hidden">
@@ -486,7 +491,7 @@
                             </button>
                             <div class="flex items-center gap-1">
                                 <button id="ctrlMuteBtn" onclick="toggleMute()" class="text-white hover:text-primary p-1 text-xs">
-                                    <i class="fa-solid fa-volume-high text-[10px]"></i>
+                                    <i class="fa-solid fa-volume-xmark text-[10px]"></i>
                                 </button>
                                 <input type="range" id="ctrlVolumeSlider" oninput="onVolumeSliderChange()" min="0" max="1" step="0.1" value="1" class="w-14 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-primary">
                             </div>
@@ -756,6 +761,45 @@
         </div>
     </div>
 
+    <!-- Modal: About & Disclaimer -->
+    <div id="aboutModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+            <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
+                <h3 class="text-xs font-extrabold tracking-wide text-main uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-primary"></i> Giới Thiệu & Bản Quyền
+                </h3>
+                <button onclick="toggleAboutModal(false)" class="text-muted hover:text-main transition w-7 h-7 rounded-full hover:bg-variant flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 space-y-4 text-xs leading-relaxed text-muted">
+                <div class="space-y-1">
+                    <h4 class="font-extrabold text-main text-sm flex items-center gap-1.5">
+                        IPTV Hub <span class="text-[9px] bg-primary/20 text-primary-light px-2 py-0.5 rounded font-extrabold">v2.6 PRO</span>
+                    </h4>
+                    <p>Hệ thống trình phát IPTV cá nhân siêu nhẹ, được phát triển trên phong cách glassmorphism tối giản và tập trung cao vào hiệu năng xử lý danh sách kênh lớn.</p>
+                </div>
+                
+                <div class="border-t border-borderColor/50 pt-3 space-y-2">
+                    <h4 class="font-extrabold text-primary uppercase text-[10px] tracking-wider">Tuyên bố miễn trừ bản quyền</h4>
+                    <p class="text-main bg-variant/40 p-3 rounded-xl border border-borderColor/50 leading-relaxed">
+                        Phần mềm này <strong>chỉ cung cấp giải pháp giao diện, trình phát đa phương tiện và công cụ quản lý</strong> danh mục tivi cá nhân. Chúng tôi hoàn toàn <strong>không sở hữu, không lưu trữ và không cung cấp sẵn</strong> bất cứ đường link, kênh truyền hình hay nội dung phát sóng nào. Người dùng tự chịu trách nhiệm pháp lý đối với nội dung của playlist (M3U) do mình tự tải lên hoặc liên kết từ bên thứ ba.
+                    </p>
+                </div>
+
+                <div class="border-t border-borderColor/50 pt-3 flex justify-between items-center text-[10px] text-muted">
+                    <span>Phát triển: <strong class="text-main">Trung & Gemini</strong></span>
+                    <span class="text-primary-light font-extrabold">IPTV Hub Team © 2026</span>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 bg-dialogFooter border-t border-borderColor/50 flex justify-end">
+                <button onclick="toggleAboutModal(false)" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-full transition shadow-md">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Confirmation Prompt -->
     <div id="confirmModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-xs shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
@@ -775,33 +819,6 @@
         <i id="toastIcon" class="fa-solid fa-info-circle text-primary text-sm"></i>
         <span id="toastMessage" class="text-xs font-bold leading-relaxed">Thông báo</span>
     </div>
-
-    <script>
-        // --- DATA PERSISTENCE & INDEXEDDB SETUP ---
-        const DB_NAME = "IPTV_Hub_DB_V2";
-        const DB_VERSION = 2;
-        let db;
-
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains("playlists")) {
-                        db.createObjectStore("playlists", { keyPath: "id" });
-                    }
-                    if (!db.objectStoreNames.contains("epg")) {
-                        db.createObjectStore("epg", { keyPath: "channelId" });
-                    }
-                };
-                request.onsuccess = (e) => {
-                    db = e.target.result;
-                    resolve(db);
-                };
-                request.onerror = (e) => reject(e.target.error);
-            });
-        }
-    </script>
 
     <script>
         function showToast(message, type = "info") {
@@ -1461,7 +1478,7 @@
     <script>
         function renderChannels() {
             const listContainer = document.getElementById("channelList");
-            const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+            const searchQuery = document.getElementById("searchInput").value.toLowerCase().trim();
             const groupFilter = document.getElementById("groupSelect").value;
             
             listContainer.innerHTML = "";
@@ -1483,6 +1500,10 @@
                 return matchesSearch && matchesGroup && matchesFav && matchesHidden;
             });
 
+            // Performance Guard: Limits concurrent DOM elements rendering to prevent lag on mobile/TVs
+            const MAX_DISPLAY = 150;
+            const displayed = filtered.slice(0, MAX_DISPLAY);
+
             document.getElementById("channelCount").textContent = `Đang lọc: ${filtered.length}/${currentChannels.length}`;
 
             if (filtered.length === 0) {
@@ -1490,7 +1511,7 @@
                 return;
             }
 
-            filtered.forEach(chan => {
+            displayed.forEach(chan => {
                 const chanKey = getChannelKey(chan);
                 const isFav = !!favorites[chanKey];
                 const isPlaying = currentActiveChannels[activeSlotIndex] && currentActiveChannels[activeSlotIndex].url === chan.url;
@@ -1522,7 +1543,7 @@
                 let editToolsHtml = '';
                 if (editMode) {
                     editToolsHtml = `
-                        <div class="flex items-center gap-1 mt-2 pt-1.5 border-t border-borderInput/20">
+                        <div class="flex items-center gap-1 mt-2 pt-1.5 border-t border-borderInput/20 shrink-0">
                             <button onclick="moveChannel('${chanKey}', -1)" class="p-1 text-muted hover:text-main text-[9px] bg-variant rounded-lg border border-borderInput flex-1 flex items-center justify-center gap-0.5">
                                 <i class="fa-solid fa-arrow-up text-[8px]"></i> Lên
                             </button>
@@ -1565,6 +1586,22 @@
                 `;
                 listContainer.appendChild(div);
             });
+
+            // Display warning if there are more hidden items
+            if (filtered.length > MAX_DISPLAY) {
+                const hintDiv = document.createElement("div");
+                hintDiv.className = "text-center py-3 text-muted text-[10px] italic border-t border-borderColor/20 mt-2 shrink-0";
+                hintDiv.textContent = `Chỉ hiển thị ${MAX_DISPLAY} kênh đầu tiên. Hãy dùng thanh tìm kiếm để lọc tiếp.`;
+                listContainer.appendChild(hintDiv);
+            }
+        }
+
+        let filterTimeout = null;
+        function filterChannels() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                renderChannels();
+            }, 150);
         }
 
         function getChannelKey(chan) {
@@ -1747,7 +1784,7 @@
             if (!activeChan) return;
             const key = getChannelKey(activeChan);
             if (favorites[key]) {
-                btn.className = "bg-yellow-500/10 text-yellow-500 p-2 rounded-full border border-yellow-500/20 w-9 h-9 flex items-center justify-center";
+                btn.className = "bg-yellow-500/10 text-yellow-500 p-2 rounded-full border border-yellow-500/20 w-9 h-9 flex items-center justify-center shadow-inner";
                 btn.innerHTML = `<i class="fa-solid fa-star text-xs"></i>`;
             } else {
                 btn.className = "bg-variant text-muted hover:text-main p-2 rounded-full border border-borderInput w-9 h-9 flex items-center justify-center";
@@ -1791,7 +1828,7 @@
             }
         }
 
-        // Đóng mở các hộp thoại modal
+        // Toggle dialog modals
         function toggleSettingsModal(show) {
             document.getElementById("settingsModal").classList.toggle("hidden", !show);
         }
@@ -1802,6 +1839,10 @@
 
         function toggleEpgModal(show) {
             document.getElementById("epgModal").classList.toggle("hidden", !show);
+        }
+
+        function toggleAboutModal(show) {
+            document.getElementById("aboutModal").classList.toggle("hidden", !show);
         }
 
         function openPlaylistSetup() {
@@ -2278,6 +2319,7 @@
                     }, 3000);
                 });
 
+                // Periodic check for timeline program changes
                 setInterval(updateEpgUIAndProgress, 60000);
             } catch (err) {
                 console.error("Lỗi khởi tạo hệ thống:", err);
