@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPTV Hub Pro</title>
-    <link class="js-favicon" rel="icon" type="image/png" href="https://placehold.co/32x32/875cff/ffffff?text=TV">
+    <link class="js-favicon" rel="icon" type="image/png" href="tv.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,29 +33,33 @@
         }
     </script>
     
-    <!-- FontAwesome Icons & Google Fonts -->
+    <!-- Icons & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- HLS.js for streaming M3U8 links -->
+    <!-- HLS.js & Shaka Player compiled for DRM DRM (Widevine, ClearKey) & adaptive streaming -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.js"></script>
+    
+    <!-- Accurate Vietnamese Lunar Date Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@nghiavuive/lunar_date_vi@2.0.1/dist/index.umd.min.js"></script>
     
     <style>
         :root.dark-theme {
-            --bg-base: #0a0a0c;
-            --bg-surface: #121215;
-            --bg-variant: #1a1a1e;
-            --bg-variant-hover: #232328;
-            --bg-footer: #0e0e11;
-            --text-main: #e3e2e6;
-            --text-muted: #8e8d91;
+            --bg-base: #060608;
+            --bg-surface: rgba(16, 16, 22, 0.75);
+            --bg-variant: rgba(26, 26, 36, 0.5);
+            --bg-variant-hover: rgba(40, 40, 54, 0.7);
+            --bg-footer: rgba(12, 12, 16, 0.9);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
             --border-color: rgba(255, 255, 255, 0.08);
             --border-input: rgba(255, 255, 255, 0.12);
-            --dialog-bg: #121215;
+            --dialog-bg: rgba(20, 20, 26, 0.96);
             --dialog-footer: #0c0c0f;
             --card-active: rgba(135, 92, 255, 0.15);
             
-            /* Theme Colors */
+            /* Primary Colors */
             --color-primary: #875cff;
             --color-primary-hover: #9d7aff;
             --color-primary-light: #d0bcff;
@@ -64,18 +68,18 @@
         }
         
         :root.light-theme {
-            --bg-base: #f3f4f6;
-            --bg-surface: #ffffff;
-            --bg-variant: #e5e7eb;
-            --bg-variant-hover: #d1d5db;
-            --bg-footer: #f9fafb;
+            --bg-base: #f3f4f7;
+            --bg-surface: rgba(255, 255, 255, 0.8);
+            --bg-variant: rgba(243, 244, 246, 0.7);
+            --bg-variant-hover: rgba(229, 231, 235, 0.85);
+            --bg-footer: rgba(249, 250, 251, 0.9);
             --text-main: #111827;
-            --text-muted: #4b5563; 
-            --border-color: rgba(0, 0, 0, 0.08);
-            --border-input: rgba(0, 0, 0, 0.15);
-            --dialog-bg: #ffffff;
+            --text-muted: #6b7280; 
+            --border-color: rgba(0, 0, 0, 0.06);
+            --border-input: rgba(0, 0, 0, 0.1);
+            --dialog-bg: rgba(255, 255, 255, 0.98);
             --dialog-footer: #f9fafb;
-            --card-active: rgba(135, 92, 255, 0.1);
+            --card-active: rgba(135, 92, 255, 0.12);
             
             /* High Contrast Colors */
             --color-primary: #6d28d9;
@@ -89,9 +93,9 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-base);
             color: var(--text-main);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
         }
-        
+
         #sidebarSection {
             transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, padding 0.35s ease;
         }
@@ -112,7 +116,7 @@
         }
         
         ::-webkit-scrollbar-track {
-            background: var(--bg-base);
+            background: transparent;
         }
         
         ::-webkit-scrollbar-thumb {
@@ -131,25 +135,27 @@
         
         .multiview-grid {
             display: grid;
-            gap: 6px;
+            gap: 8px;
             width: 100%;
             height: 100%;
             background: #000;
+            border-radius: 12px;
+            overflow: hidden;
         }
         
         .multiview-box {
             position: relative;
             background: #000;
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            transition: border-color 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .grid-layout-1-3 {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             height: 100%;
         }
         
@@ -162,17 +168,17 @@
             flex: 1;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            gap: 8px;
         }
         
         .multiview-grid.multi-active .multiview-box {
-            border: 2px solid #1f1f23;
+            border: 2px solid rgba(255, 255, 255, 0.05);
         }
         
         .multiview-grid.multi-active .multiview-box.active-slot,
         .grid-layout-1-3.multi-active .multiview-box.active-slot {
             border-color: var(--color-primary) !important;
-            box-shadow: 0 0 10px var(--color-primary-light-bg);
+            box-shadow: 0 0 15px var(--color-primary), inset 0 0 10px rgba(255, 255, 255, 0.1);
         }
         
         .wave-container {
@@ -203,7 +209,6 @@
         body.cinema-mode-active header,
         body.cinema-mode-active #sidebarSection,
         body.cinema-mode-active #sidebarToggleBtn,
-        body.cinema-mode-active #controlBarInfo,
         body.cinema-mode-active #epgCurrentBar,
         body.cinema-mode-active #multiviewSettingsContainer {
             display: none !important;
@@ -239,15 +244,29 @@
             transition: opacity 0.2s ease;
             z-index: 40;
         }
+
+        .animate-spin-slow {
+            animation: spin 6s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="bg-[#0a0a0c] text-[#e3e2e6] h-full flex flex-col overflow-hidden antialiased">
+<body class="h-full flex flex-col overflow-hidden antialiased">
 
-    <!-- Header App Bar -->
-    <header class="bg-surface border-b border-borderColor px-5 py-3 flex flex-col md:flex-row items-center justify-between shrink-0 gap-3 shadow-md z-20">
+    <!-- Beautiful Ambient ColorOS Glow Spheres -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[10%] left-[15%] w-[350px] h-[350px] rounded-full bg-primary/8 blur-[120px] animate-[pulse_8s_infinite]"></div>
+        <div class="absolute bottom-[20%] right-[10%] w-[450px] h-[450px] rounded-full bg-primary/5 blur-[150px] animate-[pulse_10s_infinite_alternate]"></div>
+    </div>
+
+    <!-- Header App Bar (Frosted Glass ColorOS) -->
+    <header class="bg-surface backdrop-blur-xl border-b border-borderColor px-5 py-3 flex flex-col md:flex-row items-center justify-between shrink-0 gap-3 shadow-lg z-20 relative">
         <div class="flex items-center justify-between w-full md:w-auto">
             <div class="flex items-center gap-3 min-w-0">
-                <div class="bg-primary text-white p-2.5 rounded-2xl flex items-center justify-center shrink-0">
+                <div class="bg-primary text-white p-2.5 rounded-2xl flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(var(--primary-rgb,135,92,255),0.3)]">
                     <i class="fa-solid fa-tv text-md"></i>
                 </div>
                 <div class="min-w-0">
@@ -260,18 +279,23 @@
                             <i class="fa-solid fa-circle-info text-xs"></i>
                         </button>
                     </h1>
-                    <p class="text-[10px] text-muted truncate">Trình phát sóng truyền hình tối giản & mượt mà</p>
+                    <p class="text-[10px] text-muted truncate">Thiết kế ColorOS Glow & Trình phát đa phương tiện thế hệ mới</p>
                 </div>
             </div>
             
-            <!-- Mobile settings trigger -->
-            <button onclick="toggleSettingsModal(true)" class="md:hidden bg-variant hover:bg-variantHover text-main p-2 rounded-full transition border border-borderColor flex items-center justify-center w-8 h-8">
-                <i class="fa-solid fa-gear text-xs"></i>
-            </button>
+            <!-- Mobile settings & Theme trigger -->
+            <div class="flex items-center gap-1.5 md:hidden">
+                <button onclick="toggleTheme()" class="bg-variant hover:bg-variantHover text-main p-2 rounded-full transition border border-borderColor flex items-center justify-center w-8 h-8">
+                    <i id="themeToggleIconMobile" class="fa-solid fa-moon text-xs"></i>
+                </button>
+                <button onclick="toggleSettingsModal(true)" class="bg-variant hover:bg-variantHover text-main p-2 rounded-full transition border border-borderColor flex items-center justify-center w-8 h-8">
+                    <i class="fa-solid fa-gear text-xs"></i>
+                </button>
+            </div>
         </div>
         
         <!-- Live Calendar (Solar & Lunar) - Hidden on Mobile -->
-        <div class="hidden md:flex items-center bg-variant/50 border border-borderColor rounded-2xl px-4 py-2 gap-3 text-xs w-full md:w-auto justify-center md:justify-start">
+        <div class="hidden md:flex items-center bg-variant/50 backdrop-blur-md border border-borderColor rounded-2xl px-4 py-2 gap-3 text-xs w-full md:w-auto justify-center md:justify-start">
             <div class="flex items-center gap-1.5 text-primary-light font-extrabold">
                 <i class="fa-regular fa-clock"></i>
                 <span id="txtLiveTime">00:00</span>
@@ -279,11 +303,16 @@
             <div class="h-4 w-[1px] bg-borderColor"></div>
             <div class="flex flex-col text-left">
                 <span id="txtSolarDate" class="text-main font-bold">Ngày 01 tháng 01 năm 2026</span>
-                <span id="txtLunarDate" class="text-muted text-[10px] font-medium">Âm lịch: Ngày 01/01</span>
+                <span id="txtLunarDate" class="text-muted text-[10px] font-semibold">Đang tính toán âm lịch...</span>
             </div>
         </div>
 
+        <!-- Fast Header Action Tools (PC) -->
         <div class="hidden md:flex items-center gap-2 w-full md:w-auto justify-end">
+            <!-- Light/Dark Fast Switcher -->
+            <button onclick="toggleTheme()" class="bg-variant hover:bg-variantHover text-main p-2.5 rounded-full transition border border-borderColor flex items-center justify-center w-10 h-10 shrink-0" title="Chuyển chế độ sáng/tối">
+                <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+            </button>
             <button onclick="toggleSettingsModal(true)" class="bg-variant hover:bg-variantHover text-main p-2.5 rounded-full transition border border-borderColor flex items-center justify-center w-10 h-10 shrink-0" title="Cài đặt hệ thống">
                 <i class="fa-solid fa-gear"></i>
             </button>
@@ -291,13 +320,13 @@
     </header>
 
     <!-- Main Workspace Container -->
-    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative p-3 gap-3">
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative p-3 gap-3 z-10">
         
-        <!-- Sidebar: Playlists & Channels (Takes remaining vertical space on mobile) -->
-        <section id="sidebarSection" class="w-full md:w-80 lg:w-[320px] bg-surface rounded-2xl border border-borderColor flex flex-col shrink-0 flex-1 md:flex-none md:h-full overflow-hidden shadow-sm z-10 order-2 md:order-1">
+        <!-- Sidebar: Playlists, Channels & Full Lunar/Epg list -->
+        <section id="sidebarSection" class="w-full md:w-80 lg:w-[320px] bg-surface backdrop-blur-xl rounded-2xl border border-borderColor flex flex-col shrink-0 flex-1 md:flex-none md:h-full overflow-hidden shadow-xl">
             
             <!-- Search & Filters -->
-            <div class="p-3.5 space-y-3 border-b border-borderColor bg-surface shrink-0">
+            <div class="p-3.5 space-y-3 border-b border-borderColor bg-transparent shrink-0">
                 <!-- Dropdown selector -->
                 <div class="bg-variant rounded-xl p-2 border border-borderInput">
                     <label class="block text-[8px] text-muted font-extrabold mb-0.5 px-1 uppercase tracking-wider">Danh Sách IPTV</label>
@@ -354,7 +383,7 @@
             </div>
 
             <!-- TABS CHO SIDEBAR (Chuyển đổi Kênh & Lịch phát sóng) -->
-            <div class="flex border-b border-borderColor bg-surface shrink-0">
+            <div class="flex border-b border-borderColor bg-transparent shrink-0">
                 <button id="sidebarTabChannels" onclick="setSidebarView('channels')" class="flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-list-ul"></i> Danh sách kênh
                 </button>
@@ -384,8 +413,8 @@
             <i id="sidebarToggleIcon" class="fa-solid fa-chevron-left text-[10px]"></i>
         </button>
 
-        <!-- Player Workspace (Takes aspect height on mobile) -->
-        <section class="w-full md:w-auto flex-none md:flex-1 flex flex-col bg-black md:bg-surface rounded-2xl border border-borderColor h-[30vh] md:h-full overflow-hidden shadow-sm relative stage-container z-0 order-1 md:order-2">
+        <!-- Player Workspace (Glass stage Container) -->
+        <section class="w-full md:w-auto flex-none md:flex-1 flex flex-col bg-black md:bg-surface/60 backdrop-blur-xl rounded-2xl border border-borderColor h-[30vh] md:h-full overflow-hidden shadow-2xl relative stage-container z-0 order-1 md:order-2">
             
             <!-- Video Frame Container -->
             <div class="flex-1 relative bg-black overflow-hidden">
@@ -447,7 +476,7 @@
                         <i class="fa-solid fa-clapperboard text-lg animate-pulse"></i>
                     </div>
                     <h3 class="text-xs font-extrabold text-white">Chưa Chọn Kênh Phát</h3>
-                    <p class="text-[10px] text-muted max-w-xs mt-1 leading-relaxed">Chọn kênh bất kỳ ở dưới để bắt đầu trình phát. <br>Thêm playlist mới trong mục Cài Đặt (bánh răng).</p>
+                    <p class="text-[10px] text-muted max-w-xs mt-1 leading-relaxed">Chọn kênh bất kỳ ở dưới để bắt đầu trình phát. <br>Hỗ trợ tuyệt vời các luồng HLS (.m3u8), DASH (.mpd) & kênh bảo mật DRM Widevine/ClearKey.</p>
                 </div>
 
                 <!-- Custom Overlay Playbar controls -->
@@ -534,7 +563,7 @@
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-1.5">
-                    </button>
+                    <!-- REMOVED BUTTON WATCH TIMELINE AS REQUESTED -->
                     <button id="favoriteBtn" onclick="toggleCurrentFavorite()" class="bg-variant hover:bg-variantHover text-muted p-2 rounded-full transition border border-borderInput w-9 h-9 flex items-center justify-center" title="Yêu thích">
                         <i class="fa-solid fa-star text-xs"></i>
                     </button>
@@ -571,7 +600,7 @@
     </main>
 
     <!-- Modal: Settings dialog -->
-    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
                 <h3 class="text-xs font-extrabold text-main tracking-wider uppercase flex items-center gap-1.5">
@@ -588,21 +617,58 @@
                     <h4 class="text-[10px] font-extrabold text-primary uppercase tracking-wider">Giao Diện & Màu Sắc</h4>
                     <div class="grid grid-cols-2 gap-2">
                         <button onclick="applyUiTheme('dark')" class="p-2.5 bg-variant hover:bg-variantHover rounded-xl border border-borderInput text-xs font-bold text-main flex flex-col items-center gap-1 transition">
-                            <i class="fa-solid fa-moon text-sm"></i> Nền Tối
+                            <i class="fa-solid fa-moon text-sm"></i> Nền Tối (ColorOS Dark)
                         </button>
                         <button onclick="applyUiTheme('light')" class="p-2.5 bg-variant hover:bg-variantHover rounded-xl border border-borderInput text-xs font-bold text-main flex flex-col items-center gap-1 transition">
-                            <i class="fa-solid fa-sun text-sm"></i> Nền Sáng
+                            <i class="fa-solid fa-sun text-sm"></i> Nền Sáng (ColorOS Light)
                         </button>
                     </div>
                     
                     <div class="space-y-1 pt-1.5">
-                        <label class="block text-[9px] text-muted font-extrabold uppercase tracking-widest px-1">Tông màu chủ đạo</label>
-                        <div class="flex items-center gap-2">
-                            <button onclick="applyColorTheme('purple')" class="w-6 h-6 rounded-full bg-[#875cff] border-2 border-transparent hover:scale-110 transition" title="Tím"></button>
-                            <button onclick="applyColorTheme('blue')" class="w-6 h-6 rounded-full bg-[#1e40af] border-2 border-transparent hover:scale-110 transition" title="Xanh dương"></button>
-                            <button onclick="applyColorTheme('green')" class="w-6 h-6 rounded-full bg-[#065f46] border-2 border-transparent hover:scale-110 transition" title="Xanh lá"></button>
-                            <button onclick="applyColorTheme('rose')" class="w-6 h-6 rounded-full bg-[#9f1239] border-2 border-transparent hover:scale-110 transition" title="Đỏ hồng"></button>
-                            <button onclick="applyColorTheme('amber')" class="w-6 h-6 rounded-full bg-[#92400e] border-2 border-transparent hover:scale-110 transition" title="Hổ phách"></button>
+                        <label class="block text-[9px] text-muted font-extrabold uppercase tracking-widest px-1">Mẫu màu thiết kế (ColorOS Glow)</label>
+                        <div class="grid grid-cols-2 gap-2 mt-1.5">
+                            <button onclick="applyColorTheme('purple')" class="p-2 bg-variant hover:bg-variantHover rounded-xl border border-borderInput flex items-center gap-2 transition text-left">
+                                <span class="w-3.5 h-3.5 rounded-full bg-[#875cff] shrink-0"></span>
+                                <div class="min-w-0">
+                                    <span class="text-[10px] font-bold block truncate text-main">Deep Purple</span>
+                                    <span class="text-[8px] text-muted block truncate">Hoàng Gia</span>
+                                </div>
+                            </button>
+                            <button onclick="applyColorTheme('blue')" class="p-2 bg-variant hover:bg-variantHover rounded-xl border border-borderInput flex items-center gap-2 transition text-left">
+                                <span class="w-3.5 h-3.5 rounded-full bg-[#0082ff] shrink-0"></span>
+                                <div class="min-w-0">
+                                    <span class="text-[10px] font-bold block truncate text-main">Neon Blue</span>
+                                    <span class="text-[8px] text-muted block truncate">Tương Lai</span>
+                                </div>
+                            </button>
+                            <button onclick="applyColorTheme('green')" class="p-2 bg-variant hover:bg-variantHover rounded-xl border border-borderInput flex items-center gap-2 transition text-left">
+                                <span class="w-3.5 h-3.5 rounded-full bg-[#10b981] shrink-0"></span>
+                                <div class="min-w-0">
+                                    <span class="text-[10px] font-bold block truncate text-main">Forest Emerald</span>
+                                    <span class="text-[8px] text-muted block truncate">Tự Nhiên</span>
+                                </div>
+                            </button>
+                            <button onclick="applyColorTheme('amber')" class="p-2 bg-variant hover:bg-variantHover rounded-xl border border-borderInput flex items-center gap-2 transition text-left">
+                                <span class="w-3.5 h-3.5 rounded-full bg-[#f59e0b] shrink-0"></span>
+                                <div class="min-w-0">
+                                    <span class="text-[10px] font-bold block truncate text-main">Sunset Amber</span>
+                                    <span class="text-[8px] text-muted block truncate">Ấm Áp</span>
+                                </div>
+                            </button>
+                            <button onclick="applyColorTheme('rose')" class="p-2 bg-variant hover:bg-variantHover rounded-xl border border-borderInput flex items-center gap-2 transition text-left">
+                                <span class="w-3.5 h-3.5 rounded-full bg-[#f43f5e] shrink-0"></span>
+                                <div class="min-w-0">
+                                    <span class="text-[10px] font-bold block truncate text-main">Rose Gold</span>
+                                    <span class="text-[8px] text-muted block truncate">Sang Trọng</span>
+                                </div>
+                            </button>
+                            <button onclick="applyColorTheme('aura')" class="p-2 bg-variant hover:bg-variantHover rounded-xl border border-borderInput flex items-center gap-2 transition text-left">
+                                <span class="w-3.5 h-3.5 rounded-full bg-[#00f2fe] shrink-0 shadow-[0_0_8px_rgba(0,242,254,0.4)]"></span>
+                                <div class="min-w-0">
+                                    <span class="text-[10px] font-bold block truncate text-main">Aura Glow</span>
+                                    <span class="text-[8px] text-muted block truncate">ColorOS</span>
+                                </div>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -631,7 +697,7 @@
     </div>
 
     <!-- Modal: Add Playlist -->
-    <div id="playlistModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="playlistModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
                 <h3 class="text-xs font-extrabold tracking-wide text-main uppercase">Thêm Playlist IPTV</h3>
@@ -672,7 +738,7 @@
     </div>
 
     <!-- Modal: EPG Settings -->
-    <div id="epgModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="epgModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
                 <h3 class="text-xs font-extrabold text-main uppercase">Đồng Bộ Lịch EPG</h3>
@@ -725,7 +791,7 @@
     </div>
 
     <!-- Modal: About & Disclaimer (Giới thiệu & Tuyên bố bản quyền) -->
-    <div id="aboutModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div id="aboutModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
         <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
             <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
                 <h3 class="text-xs font-extrabold tracking-wide text-main uppercase flex items-center gap-2">
@@ -739,7 +805,7 @@
             <div class="p-5 space-y-4 text-xs leading-relaxed text-muted">
                 <div class="space-y-1">
                     <h4 class="font-extrabold text-main text-sm flex items-center gap-1.5">
-                        IPTV Hub <span class="text-[9px] bg-primary/20 text-primary-light px-2 py-0.5 rounded font-extrabold">v2.6 PRO</span>
+                        IPTV Hub <span class="text-[9px] bg-primary/20 text-primary-light px-2 py-0.5 rounded font-extrabold">v2.8 PRO</span>
                     </h4>
                     <p>Hệ thống trình phát IPTV cá nhân siêu nhẹ, được phát triển trên phong cách glassmorphism tối giản và tập trung cao vào hiệu năng xử lý danh sách kênh lớn.</p>
                 </div>
@@ -764,7 +830,7 @@
     </div>
 
     <!-- Modal: Confirmation Prompt -->
-    <div id="confirmModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="confirmModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-xs shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div class="p-5 space-y-2">
                 <h3 id="confirmTitle" class="text-xs font-extrabold text-main uppercase">Tiêu đề</h3>
@@ -778,18 +844,17 @@
     </div>
 
     <!-- Notification Toast -->
-    <div id="toast" class="hidden fixed bottom-6 right-6 bg-variant border border-borderColor text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300">
+    <div id="toast" class="hidden fixed bottom-6 right-6 bg-variant/90 border border-borderColor text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300 backdrop-blur-md">
         <i id="toastIcon" class="fa-solid fa-info-circle text-primary text-sm"></i>
         <span id="toastMessage" class="text-xs font-bold leading-relaxed">Thông báo</span>
     </div>
 
-    <!-- KHỐI MÃ JAVASCRIPT HỢP NHẤT TOÀN DIỆN (PREVENTS "db is not defined" ERRORS) -->
+    <!-- KHỐI MÃ JAVASCRIPT HỢP NHẤT TOÀN DIỆN -->
     <script>
-        // --- 1. KHAI BÁO BIẾN TRẠNG THÁI TOÀN CỤC ---
         const DB_NAME = "IPTV_Hub_DB_V2";
         const DB_VERSION = 2;
-        let db = null; // Khởi tạo DB mặc định là null để kiểm tra trạng thái an toàn
-        let isLocalStorageFallback = false; // Cờ lưu trữ dự phòng khi chạy trên sandbox iframe bị chặn
+        let db = null; 
+        let isLocalStorageFallback = false; 
 
         let playlists = [];
         let currentPlaylistId = "";
@@ -814,19 +879,19 @@
         let controlHideTimer = null;
         let epgChannelsMap = {}; 
         let cinemaModeActive = false;
-        let currentSidebarView = 'channels'; // Trạng thái tab hiển thị hiện tại trong sidebar
+        let currentSidebarView = 'channels'; 
 
         const colorThemes = {
             purple: { primary: '#875cff', hover: '#7043eb', light: '#d0bcff', lightAlpha: 'rgba(208, 188, 255, 0.1)', focusAlpha: 'rgba(135, 92, 255, 0.25)' },
-            blue: { primary: '#1e40af', hover: '#1d4ed8', light: '#93c5fd', lightAlpha: 'rgba(147, 197, 253, 0.1)', focusAlpha: 'rgba(30, 64, 175, 0.25)' },
-            green: { primary: '#065f46', hover: '#047857', light: '#a7f3d0', lightAlpha: 'rgba(167, 243, 208, 0.1)', focusAlpha: 'rgba(6, 95, 70, 0.25)' },
-            rose: { primary: '#9f1239', hover: '#be123c', light: '#fecdd3', lightAlpha: 'rgba(254, 205, 211, 0.1)', focusAlpha: 'rgba(159, 18, 57, 0.25)' },
-            amber: { primary: '#92400e', hover: '#b45309', light: '#fde68a', lightAlpha: 'rgba(253, 230, 138, 0.1)', focusAlpha: 'rgba(146, 64, 14, 0.25)' }
+            blue: { primary: '#0082ff', hover: '#006cdb', light: '#93c5fd', lightAlpha: 'rgba(147, 197, 253, 0.1)', focusAlpha: 'rgba(0, 130, 255, 0.25)' },
+            green: { primary: '#10b981', hover: '#059669', light: '#a7f3d0', lightAlpha: 'rgba(167, 243, 208, 0.1)', focusAlpha: 'rgba(16, 185, 129, 0.25)' },
+            rose: { primary: '#f43f5e', hover: '#e11d48', light: '#fecdd3', lightAlpha: 'rgba(254, 205, 211, 0.1)', focusAlpha: 'rgba(244, 63, 94, 0.25)' },
+            amber: { primary: '#f59e0b', hover: '#d97706', light: '#fde68a', lightAlpha: 'rgba(253, 230, 138, 0.1)', focusAlpha: 'rgba(245, 158, 11, 0.25)' },
+            aura: { primary: '#00f2fe', hover: '#00c3cb', light: '#a5f3fc', lightAlpha: 'rgba(165, 243, 252, 0.1)', focusAlpha: 'rgba(0, 242, 254, 0.25)' }
         };
 
         let confirmResolve = null;
 
-        // --- 2. HỆ THỐNG ĐIỀU KHIỂN & TIỆN ÍCH BAN ĐẦU ---
         function safePlay(video) {
             if (!video) return;
             const playPromise = video.play();
@@ -846,7 +911,7 @@
                 if (isDangerous) {
                     okBtn.className = "px-4 py-2 bg-red-900 text-red-100 text-xs font-bold rounded-full transition hover:bg-red-800";
                 } else {
-                    okBtn.className = "px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-full transition hover:bg-indigo-700 shadow-md";
+                    okBtn.className = "px-4 py-2 bg-primary text-white text-xs font-bold rounded-full transition hover:bg-primary-hover shadow-md";
                 }
                 modal.classList.remove("hidden");
                 confirmResolve = resolve;
@@ -872,13 +937,13 @@
             
             if (type === "success") {
                 if (icon) icon.className = "fa-solid fa-circle-check text-green-400 text-sm";
-                toast.className = "fixed bottom-6 right-6 bg-variant border border-green-400/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300";
+                toast.className = "fixed bottom-6 right-6 bg-variant border border-green-400/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300 backdrop-blur-md";
             } else if (type === "error") {
                 if (icon) icon.className = "fa-solid fa-circle-exclamation text-red-400 text-sm";
-                toast.className = "fixed bottom-6 right-6 bg-variant border border-red-500/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300";
+                toast.className = "fixed bottom-6 right-6 bg-variant border border-red-500/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300 backdrop-blur-md";
             } else {
                 if (icon) icon.className = "fa-solid fa-circle-info text-primary text-sm";
-                toast.className = "fixed bottom-6 right-6 bg-variant border border-primary/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300";
+                toast.className = "fixed bottom-6 right-6 bg-variant border border-primary/20 text-main px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 max-w-xs transition duration-300 backdrop-blur-md";
             }
 
             toast.classList.remove("hidden");
@@ -898,17 +963,34 @@
             const solarDateEl = document.getElementById("txtSolarDate");
             if (solarDateEl) solarDateEl.textContent = `Ngày ${day} tháng ${month} năm ${year}`;
 
-            const lunarDay = day; 
-            const lunarMonth = month;
-            const can = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
-            const chi = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
-            const lunarYearName = `${can[(year - 4) % 10]} ${chi[(year - 4) % 12]}`;
-
             const lunarDateEl = document.getElementById("txtLunarDate");
-            if (lunarDateEl) lunarDateEl.textContent = `Âm lịch: Ngày ${lunarDay}/${lunarMonth} (Năm ${lunarYearName})`;
+            if (lunarDateEl) {
+                if (window._calendar) {
+                    try {
+                        const solar = new window._calendar.SolarDate(now);
+                        const lunar = solar.toLunarDate();
+                        const lDay = lunar.day;
+                        const lMonth = lunar.month;
+                        const isLeap = lunar.leap_month ? " (Nhuận)" : "";
+                        
+                        let canChiYear = "";
+                        try {
+                            canChiYear = lunar.getYearName ? ` (${lunar.getYearName()})` : "";
+                        } catch (e) {
+                            const can = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
+                            const chi = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+                            canChiYear = ` (${can[(year - 4) % 10]} ${chi[(year - 4) % 12]})`;
+                        }
+                        lunarDateEl.textContent = `Âm lịch: Ngày ${lDay}/${lMonth}${isLeap}${canChiYear}`;
+                    } catch (err) {
+                        lunarDateEl.textContent = `Âm lịch: Lỗi tính toán`;
+                    }
+                } else {
+                    lunarDateEl.textContent = `Âm lịch: Đang tính toán...`;
+                }
+            }
         }
 
-        // --- 3. KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB VỚI FALLBACK LOCALSTORAGE ---
         function initDB() {
             return new Promise((resolve) => {
                 try {
@@ -928,19 +1010,18 @@
                         resolve(db);
                     };
                     request.onerror = (e) => {
-                        console.warn("IndexedDB blocked/denied in iframe sandbox. Using LocalStorage fallback.");
+                        console.warn("IndexedDB blocked/denied. Using LocalStorage fallback.");
                         isLocalStorageFallback = true;
                         resolve(null);
                     };
                 } catch (err) {
-                    console.warn("IndexedDB API not available. Using LocalStorage fallback.", err);
+                    console.warn("IndexedDB not available. Using LocalStorage fallback.", err);
                     isLocalStorageFallback = true;
                     resolve(null);
                 }
             });
         }
 
-        // --- 4. TIẾN TRÌNH TRUY XUẤT CƠ SỞ DỮ LIỆU KÉP ---
         async function loadPlaylistsFromDB() {
             return new Promise((resolve) => {
                 if (isLocalStorageFallback) {
@@ -1033,7 +1114,6 @@
             });
         }
 
-        // --- 5. ĐỒNG BỘ PLAYLISTS ---
         async function savePlaylist() {
             const nameInput = document.getElementById("playlistName").value.trim();
             const playlistName = nameInput || `Danh sách ngày ${new Date().toLocaleDateString()}`;
@@ -1081,7 +1161,6 @@
                 togglePlaylistModal(false);
                 showToast(`Đã nạp ${channels.length} kênh thành công!`, "success");
 
-                // Auto EPG Extraction
                 const epgUrlMatch = content.match(/x-tvg-url="([^"]+)"/i) || content.match(/url-tvg="([^"]+)"/i);
                 if (epgUrlMatch && epgUrlMatch[1]) {
                     const epgUrl = epgUrlMatch[1].trim();
@@ -1161,7 +1240,6 @@
             }
         }
 
-        // --- 6. PHÂN TÍCH TỆP M3U & PROXIES NẠP DỮ LIỆU ---
         async function fetchWithFallbackProxies(url) {
             try {
                 const response = await fetch(url);
@@ -1194,12 +1272,24 @@
             const lines = m3uContent.split(/\r?\n/);
             const channels = [];
             let currentChan = null;
+            let kodiProps = {};
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
                 if (!line) continue;
 
                 if (line.startsWith("#EXTM3U")) continue;
+
+                if (line.startsWith("#KODIPROP:")) {
+                    const prop = line.substring(10).trim();
+                    const eqIdx = prop.indexOf("=");
+                    if (eqIdx !== -1) {
+                        const key = prop.substring(0, eqIdx).trim();
+                        const value = prop.substring(eqIdx + 1).trim();
+                        kodiProps[key] = value;
+                    }
+                    continue;
+                }
 
                 if (line.startsWith("#EXTINF:")) {
                     currentChan = {};
@@ -1209,6 +1299,19 @@
                     if (logoMatch) currentChan.logo = logoMatch[1];
                     const groupMatch = line.match(/group-title="([^"]+)"/i);
                     currentChan.group = groupMatch ? groupMatch[1] : "Kênh khác";
+                    
+                    const drmKeyidMatch = line.match(/drm-keyid="([^"]+)"/i);
+                    const drmKeyMatch = line.match(/drm-key="([^"]+)"/i);
+                    const licenseKeyMatch = line.match(/license-key="([^"]+)"/i) || line.match(/license-url="([^"]+)"/i);
+                    
+                    if (drmKeyidMatch || drmKeyMatch || licenseKeyMatch) {
+                        currentChan.drm = {
+                            type: licenseKeyMatch ? 'widevine' : 'clearkey',
+                            key: licenseKeyMatch ? licenseKeyMatch[1] : (drmKeyMatch ? drmKeyMatch[1] : ''),
+                            keyId: drmKeyidMatch ? drmKeyidMatch[1] : ''
+                        };
+                    }
+
                     const commaIdx = line.lastIndexOf(",");
                     currentChan.name = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : "Kênh không tên";
                 } else if (!line.startsWith("#")) {
@@ -1220,6 +1323,15 @@
                             };
                         }
                         currentChan.url = line;
+                        
+                        if (Object.keys(kodiProps).length > 0) {
+                            currentChan.drm = {
+                                type: kodiProps['inputstream.adaptive.license_type'] || 'widevine',
+                                key: kodiProps['inputstream.adaptive.license_key'] || ''
+                            };
+                            kodiProps = {}; 
+                        }
+                        
                         channels.push(currentChan);
                         currentChan = null;
                     }
@@ -1243,7 +1355,6 @@
             });
         }
 
-        // --- 7. QUẢN LÝ DANH MỤC & PHƯƠNG THỨC BIÊN TẬP KÊNH ---
         function toggleEditMode() {
             editMode = !editMode;
             const btn = document.getElementById("editModeBtn");
@@ -1342,7 +1453,6 @@
             }
         }
 
-        // --- 8. PHÂN TÍCH XML LỊCH CHIẾU EPG CACHE ---
         function parseXMLTV(xmlText) {
             if (!xmlText) throw new Error("Dữ liệu trống.");
             const parser = new DOMParser();
@@ -1575,7 +1685,6 @@
             }
         }
 
-        // --- 9. HIỂN THỊ DANH SÁCH KÊNH VÀ PERFORMANCE GUARD ---
         function renderChannels() {
             const listContainer = document.getElementById("channelList");
             const searchQuery = document.getElementById("searchInput").value.toLowerCase().trim();
@@ -1600,7 +1709,6 @@
                 return matchesSearch && matchesGroup && matchesFav && matchesHidden;
             });
 
-            // Performance Guard: Giới hạn DOM vẽ để tránh giật lag
             const MAX_DISPLAY = 150;
             const displayed = filtered.slice(0, MAX_DISPLAY);
 
@@ -1619,6 +1727,7 @@
 
                 const epgPrograms = getChannelEpgPrograms(chan);
                 const currentProg = getActiveProgram(epgPrograms);
+                const hasDrm = !!chan.drm;
                 
                 let epgSectionHtml = '';
                 if (currentProg) {
@@ -1661,7 +1770,7 @@
                 }
 
                 const div = document.createElement("div");
-                div.className = `channel-item group flex flex-col p-2.5 rounded-xl transition border ${isPlaying ? 'bg-cardActive border-primary/45 shadow-sm' : 'hover:bg-variant/60 border-borderColor bg-variant/20'} ${isHidden ? 'opacity-40' : ''}`;
+                div.className = `channel-item group flex flex-col p-2.5 rounded-xl transition border cursor-pointer ${isPlaying ? 'bg-cardActive border-primary/45 shadow-sm' : 'hover:bg-variant/60 border-borderColor bg-variant/20'} ${isHidden ? 'opacity-40' : ''}`;
                 div.setAttribute("tabindex", "0");
                 div.onclick = (e) => {
                     if (e.target.closest('button')) return;
@@ -1673,7 +1782,7 @@
                         <div class="flex items-center gap-2.5 min-w-0 flex-1">
                             <img src="${chan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-8 h-8 rounded-lg object-contain bg-variant border border-borderInput p-1 shrink-0">
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-xs font-bold text-main truncate ${isPlaying ? 'text-primary' : ''}">${chan.name}</h4>
+                                <h4 class="text-xs font-bold text-main truncate ${isPlaying ? 'text-primary' : ''}">${chan.name} ${hasDrm ? '<span class="text-[8px] bg-red-500/20 text-red-400 px-1 py-0.2 rounded font-extrabold border border-red-500/30 ml-1">DRM</span>' : ''}</h4>
                                 <p class="text-[9px] text-muted font-bold mt-0.5 truncate">${chan.group}</p>
                             </div>
                         </div>
@@ -1738,34 +1847,7 @@
             renderChannels();
         }
 
-        function setSidebarView(view) {
-            currentSidebarView = view;
-            const tabChannels = document.getElementById("sidebarTabChannels");
-            const tabEpg = document.getElementById("sidebarTabEpg");
-            const channelList = document.getElementById("channelList");
-            const epgContainer = document.getElementById("sidebarEpgContainer");
-
-            if (view === 'channels') {
-                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
-                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
-                channelList.classList.remove("hidden");
-                epgContainer.classList.add("hidden");
-            } else {
-                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
-                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
-                channelList.classList.add("hidden");
-                epgContainer.classList.remove("hidden");
-                updateSidebarEpgDisplay(); // Cập nhật lịch chiếu ngay
-            }
-        }
-
-        function toggleEpgTimeline(forceState = null) {
-            // Khi nhấn nút Lịch Chiếu từ trình phát, chuyển hướng Tab Sidebar tương ứng
-            setSidebarView('epg');
-        }
-
-        // --- 10. ĐẦU PHÁT TRÌNH CHIẾU MULTI-VIEW & VOD TIMELINE ---
-        function playChannel(chan) {
+        async function playChannel(chan) {
             currentActiveChannels[activeSlotIndex] = chan;
             const video = document.getElementById(`videoPlayer${activeSlotIndex}`);
             const visualizer = document.getElementById(`audioVisualizer${activeSlotIndex}`);
@@ -1792,8 +1874,20 @@
                 if (currentLogoEl) currentLogoEl.src = chan.logo || '';
             }
 
+            const isDrmStream = !!chan.drm;
+            const isDashStream = chan.url.includes(".mpd") || chan.url.includes("mpd");
+
+            // Stop and destroy previous player session
             if (players[activeSlotIndex]) {
-                players[activeSlotIndex].destroy();
+                try {
+                    if (players[activeSlotIndex].destroy) {
+                        await players[activeSlotIndex].destroy();
+                    } else {
+                        players[activeSlotIndex].destroy();
+                    }
+                } catch (e) {
+                    console.warn("Destroying previous engine player:", e);
+                }
                 players[activeSlotIndex] = null;
             }
 
@@ -1802,53 +1896,220 @@
                 if (v) { v.muted = (i !== activeSlotIndex); }
             }
 
-            const isHlsStream = chan.url.includes(".m3u8") || chan.url.includes("m3u8");
-
-            if (isHlsStream) {
-                if (Hls.isSupported()) {
-                    const hls = new Hls({ 
-                        maxMaxBufferLength: 10, 
-                        enableWorker: true, 
-                        lowLatencyMode: true,
-                        backBufferLength: 30
-                    });
-                    players[activeSlotIndex] = hls;
-                    hls.loadSource(chan.url);
-                    hls.attachMedia(video);
-                    
-                    hls.on(Hls.Events.MANIFEST_PARSED, function() { safePlay(video); });
-                    hls.on(Hls.Events.ERROR, function (event, data) {
-                        if (data.fatal) {
-                            switch (data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    hls.startLoad();
-                                    break;
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    hls.recoverMediaError();
-                                    break;
-                                default:
-                                    video.src = chan.url;
-                                    break;
+            // DRM Channel decryption & play through Shaka Player
+            if (isDrmStream || isDashStream) {
+                if (typeof shaka !== 'undefined') {
+                    shaka.polyfill.installAll();
+                    if (shaka.Player.isBrowserSupported()) {
+                        const player = new shaka.Player(video);
+                        players[activeSlotIndex] = player;
+                        
+                        if (isDrmStream) {
+                            const shakaDrmConfig = {};
+                            const drmType = chan.drm.type ? chan.drm.type.toLowerCase() : '';
+                            
+                            if (drmType.includes('clearkey')) {
+                                let clearkeyObj = {};
+                                if (chan.drm.key && chan.drm.key.includes(':')) {
+                                    const parts = chan.drm.key.split(/[:=]/);
+                                    if (parts.length === 2) {
+                                        clearkeyObj[parts[0].trim()] = parts[1].trim();
+                                    }
+                                } else if (chan.drm.keyId && chan.drm.key) {
+                                    clearkeyObj[chan.drm.keyId] = chan.drm.key;
+                                } else {
+                                    try {
+                                        clearkeyObj = JSON.parse(chan.drm.key);
+                                    } catch(e) {
+                                        clearkeyObj['default'] = chan.drm.key;
+                                    }
+                                }
+                                shakaDrmConfig.clearKeys = clearkeyObj;
+                            } else {
+                                const licenseUrl = chan.drm.key;
+                                shakaDrmConfig.servers = {
+                                    'com.widevine.alpha': licenseUrl,
+                                    'com.microsoft.playready': licenseUrl
+                                };
                             }
+                            player.configure({ drm: shakaDrmConfig });
                         }
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = chan.url;
-                    video.addEventListener('loadedmetadata', function() { safePlay(video); }, { once: true });
+                        
+                        try {
+                            await player.load(chan.url);
+                            safePlay(video);
+                            showToast(`Đang phát luồng bảo mật (DRM)`, "success");
+                        } catch (error) {
+                            console.error("Shaka DRM load error:", error);
+                            showToast("Lỗi giải mã luồng DRM: " + error.message, "error");
+                        }
+                    } else {
+                        showToast("Trình duyệt không tương thích giải mã Shaka DRM.", "error");
+                    }
                 } else {
-                    showToast("Luồng HLS .m3u8 không được hỗ trợ bởi trình duyệt này.", "error");
+                    showToast("Shaka Player đang tải. Vui lòng thử lại sau giây lát.", "error");
                 }
             } else {
-                video.src = chan.url;
-                safePlay(video);
+                // Play regular HLS / Native stream
+                const isHlsStream = chan.url.includes(".m3u8") || chan.url.includes("m3u8");
+                if (isHlsStream) {
+                    if (Hls.isSupported()) {
+                        const hls = new Hls({ 
+                            maxMaxBufferLength: 10, 
+                            enableWorker: true, 
+                            lowLatencyMode: true,
+                            backBufferLength: 30
+                        });
+                        players[activeSlotIndex] = hls;
+                        hls.loadSource(chan.url);
+                        hls.attachMedia(video);
+                        
+                        hls.on(Hls.Events.MANIFEST_PARSED, function() { safePlay(video); });
+                        hls.on(Hls.Events.ERROR, function (event, data) {
+                            if (data.fatal) {
+                                switch (data.type) {
+                                    case Hls.ErrorTypes.NETWORK_ERROR:
+                                        hls.startLoad();
+                                        break;
+                                    case Hls.ErrorTypes.MEDIA_ERROR:
+                                        hls.recoverMediaError();
+                                        break;
+                                    default:
+                                        video.src = chan.url;
+                                        break;
+                                }
+                            }
+                        });
+                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        video.src = chan.url;
+                        video.addEventListener('loadedmetadata', function() { safePlay(video); }, { once: true });
+                    } else {
+                        showToast("Luồng HLS .m3u8 không được hỗ trợ.", "error");
+                    }
+                } else {
+                    video.src = chan.url;
+                    safePlay(video);
+                }
             }
 
             const playBtn = document.getElementById("ctrlPlayBtn");
-            if (playBtn) playBtn.innerHTML = `<i class="fa-solid fa-pause text-[10px]"></i>`;
+            if (playBtn) playBtn.innerHTML = `<i class="fa-solid fa-pause text-[9px]"></i>`;
             
             updateFavBtnUI();
             updateCurrentEpgDisplay();
             triggerChannelHud();
+        }
+
+        function setSidebarView(view) {
+            currentSidebarView = view;
+            const tabChannels = document.getElementById("sidebarTabChannels");
+            const tabEpg = document.getElementById("sidebarTabEpg");
+            const channelList = document.getElementById("channelList");
+            const epgContainer = document.getElementById("sidebarEpgContainer");
+
+            if (view === 'channels') {
+                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
+                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
+                channelList.classList.remove("hidden");
+                epgContainer.classList.add("hidden");
+            } else {
+                tabChannels.className = "flex-1 py-2.5 text-xs font-extrabold text-muted border-b-2 border-transparent transition flex items-center justify-center gap-1.5";
+                tabEpg.className = "flex-1 py-2.5 text-xs font-extrabold text-primary border-b-2 border-primary transition flex items-center justify-center gap-1.5";
+                channelList.classList.add("hidden");
+                epgContainer.classList.remove("hidden");
+                updateSidebarEpgDisplay(); 
+            }
+        }
+
+        function updateSidebarEpgDisplay() {
+            const container = document.getElementById("sidebarEpgContainer");
+            const activeChan = currentActiveChannels[activeSlotIndex];
+            
+            if (!activeChan) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center p-5 space-y-3">
+                        <i class="fa-solid fa-calendar-xmark text-muted text-2xl"></i>
+                        <p class="text-xs text-muted">Chưa chọn kênh phát. Vui lòng chọn một kênh ở danh mục để tải lịch phát sóng.</p>
+                        <button onclick="setSidebarView('channels')" class="px-4 py-1.5 bg-primary text-white text-[11px] font-bold rounded-full transition hover:bg-primary-hover shadow-md">
+                            Quay lại danh sách kênh
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const programs = getChannelEpgPrograms(activeChan);
+            if (!programs || programs.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center p-5 space-y-3">
+                        <img src="${activeChan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-12 h-12 rounded-xl object-contain bg-variant p-1 border border-borderInput shrink-0 shadow-sm">
+                        <div>
+                            <h4 class="text-xs font-bold text-main">${activeChan.name}</h4>
+                            <p class="text-[9px] text-muted">${activeChan.group}</p>
+                        </div>
+                        <div class="text-[11px] text-muted bg-variant/40 border border-borderColor/50 p-3.5 rounded-xl leading-relaxed">
+                            <i class="fa-solid fa-circle-exclamation text-yellow-500 mb-1 text-sm block"></i>
+                            <p>Không tìm thấy dữ liệu lịch chiếu (EPG) cho kênh này trong nguồn XMLTV đã liên kết.</p>
+                        </div>
+                        <button onclick="setSidebarView('channels')" class="px-4 py-1.5 bg-variant border border-borderInput text-main text-[11px] font-bold rounded-full transition hover:bg-variantHover">
+                            Quay lại danh sách kênh
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const now = Date.now();
+            const activeProg = getActiveProgram(programs);
+            const upcomingPrograms = programs.filter(p => p.stop > now - (15 * 60 * 1000)).slice(0, 12);
+
+            let html = `
+                <div class="flex items-center gap-3 pb-3 border-b border-borderColor/50 mb-3.5">
+                    <img src="${activeChan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant p-1 border border-borderInput shrink-0 shadow-sm">
+                    <div class="min-w-0 flex-1">
+                        <h4 class="text-xs font-bold text-main truncate">${activeChan.name}</h4>
+                        <p class="text-[9px] text-muted truncate">${activeChan.group}</p>
+                    </div>
+                    <button onclick="setSidebarView('channels')" class="text-muted hover:text-main p-1.5 text-xs transition" title="Quay lại danh sách kênh">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <h5 class="text-[9px] font-extrabold text-primary-light uppercase tracking-wider mb-2.5">Chương trình phát sóng</h5>
+                <div class="space-y-2">
+            `;
+
+            upcomingPrograms.forEach(p => {
+                const startStr = new Date(p.start).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                const endStr = new Date(p.stop).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+                const isCurrent = activeProg && p.start === activeProg.start;
+
+                let progressHtml = '';
+                if (isCurrent) {
+                    const totalDur = p.stop - p.start;
+                    const elapsed = now - p.start;
+                    const pct = Math.max(0, Math.min(100, (elapsed / totalDur) * 100));
+                    progressHtml = `
+                        <div class="w-full bg-borderInput/30 rounded-full h-1 mt-1.5 overflow-hidden">
+                            <div class="bg-primary h-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="p-2.5 rounded-xl flex flex-col transition ${isCurrent ? 'bg-primary/10 border border-primary/30 shadow-sm' : 'bg-variant/30 border border-transparent hover:bg-variant/50'}">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[10px] font-extrabold ${isCurrent ? 'text-primary' : 'text-primary-light'}">${startStr} - ${endStr}</span>
+                            ${isCurrent ? '<span class="text-[8px] bg-primary text-white font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider scale-90">Đang chiếu</span>' : ''}
+                        </div>
+                        <h4 class="text-xs font-bold mt-1 ${isCurrent ? 'text-main' : 'text-main/95'}">${p.title}</h4>
+                        ${p.desc ? `<p class="text-[10px] text-muted mt-1 leading-relaxed line-clamp-2">${p.desc}</p>` : ''}
+                        ${progressHtml}
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
         function togglePlayPause() {
@@ -1857,10 +2118,10 @@
             if (!video) return;
             if (video.paused) {
                 safePlay(video);
-                if (btn) btn.innerHTML = `<i class="fa-solid fa-pause text-[10px]"></i>`;
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-pause text-[9px]"></i>`;
             } else {
                 video.pause();
-                if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[10px]"></i>`;
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[9px]"></i>`;
             }
         }
 
@@ -1869,7 +2130,7 @@
             const btn = document.getElementById("ctrlMuteBtn");
             if (!video) return;
             video.muted = !video.muted;
-            if (btn) btn.innerHTML = video.muted ? `<i class="fa-solid fa-volume-xmark text-[10px]"></i>` : `<i class="fa-solid fa-volume-high text-[10px]"></i>`;
+            if (btn) btn.innerHTML = video.muted ? `<i class="fa-solid fa-volume-xmark text-[9px]"></i>` : `<i class="fa-solid fa-volume-high text-[9px]"></i>`;
         }
 
         function onVolumeSliderChange() {
@@ -1924,7 +2185,6 @@
             }
         }
 
-        // --- 11. CÀI ĐẶT GIAO DIỆN & THANH ĐIỀU HƯỚNG BÊN ---
         function toggleSidebar() {
             sidebarCollapsed = !sidebarCollapsed;
             const sidebar = document.getElementById("sidebarSection");
@@ -2007,14 +2267,26 @@
             document.getElementById("panel-file").classList.toggle("hidden", tab !== 'file');
         }
 
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem("iptv_ui_theme") || "dark";
+            const nextTheme = currentTheme === "dark" ? "light" : "dark";
+            applyUiTheme(nextTheme);
+        }
+
         function applyUiTheme(themeName) {
             const html = document.documentElement;
+            const iconPC = document.getElementById("themeToggleIcon");
+            const iconMobile = document.getElementById("themeToggleIconMobile");
             if (themeName === 'light') {
                 html.classList.remove('dark-theme');
                 html.classList.add('light-theme');
+                if (iconPC) iconPC.className = "fa-solid fa-sun text-yellow-500 animate-spin-slow";
+                if (iconMobile) iconMobile.className = "fa-solid fa-sun text-yellow-500 animate-spin-slow";
             } else {
                 html.classList.remove('light-theme');
                 html.classList.add('dark-theme');
+                if (iconPC) iconPC.className = "fa-solid fa-moon text-primary-light";
+                if (iconMobile) iconMobile.className = "fa-solid fa-moon text-primary-light";
             }
             localStorage.setItem("iptv_ui_theme", themeName);
         }
@@ -2047,101 +2319,6 @@
             }
         }
 
-        // --- 11.2 UPDATE SIDEBAR EPG DETAIL TIMELINE ---
-        function updateSidebarEpgDisplay() {
-            const container = document.getElementById("sidebarEpgContainer");
-            const activeChan = currentActiveChannels[activeSlotIndex];
-            
-            if (!activeChan) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-center p-5 space-y-3">
-                        <i class="fa-solid fa-calendar-xmark text-muted text-2xl"></i>
-                        <p class="text-xs text-muted">Chưa chọn kênh phát. Vui lòng chọn một kênh ở tab "Danh sách kênh" để xem lịch chiếu.</p>
-                        <button onclick="setSidebarView('channels')" class="px-4 py-1.5 bg-primary text-white text-[11px] font-bold rounded-full transition hover:bg-primary-hover shadow-md">
-                            Quay lại danh sách kênh
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            const programs = getChannelEpgPrograms(activeChan);
-            if (!programs || programs.length === 0) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-center p-5 space-y-3">
-                        <img src="${activeChan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-12 h-12 rounded-xl object-contain bg-variant p-1 border border-borderInput shrink-0 shadow-sm">
-                        <div>
-                            <h4 class="text-xs font-bold text-main">${activeChan.name}</h4>
-                            <p class="text-[9px] text-muted">${activeChan.group}</p>
-                        </div>
-                        <div class="text-[11px] text-muted bg-variant/40 border border-borderColor/50 p-3.5 rounded-xl leading-relaxed">
-                            <i class="fa-solid fa-circle-exclamation text-yellow-500 mb-1 text-sm block"></i>
-                            <p>Không tìm thấy dữ liệu lịch chiếu (EPG) cho kênh này trong nguồn XMLTV đã liên kết.</p>
-                        </div>
-                        <button onclick="setSidebarView('channels')" class="px-4 py-1.5 bg-variant border border-borderInput text-main text-[11px] font-bold rounded-full transition hover:bg-variantHover">
-                            Quay lại danh sách kênh
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            const now = Date.now();
-            const activeProg = getActiveProgram(programs);
-
-            // Lọc các chương trình hiện tại và sắp chiếu tiếp theo
-            const upcomingPrograms = programs.filter(p => p.stop > now - (15 * 60 * 1000)).slice(0, 12);
-
-            let html = `
-                <div class="flex items-center gap-3 pb-3 border-b border-borderColor/50 mb-3.5">
-                    <img src="${activeChan.logo || ''}" onerror="this.src='https://placehold.co/40x40/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant p-1 border border-borderInput shrink-0 shadow-sm">
-                    <div class="min-w-0 flex-1">
-                        <h4 class="text-xs font-bold text-main truncate">${activeChan.name}</h4>
-                        <p class="text-[9px] text-muted truncate">${activeChan.group}</p>
-                    </div>
-                    <button onclick="setSidebarView('channels')" class="text-muted hover:text-main p-1.5 text-xs transition" title="Quay lại danh sách kênh">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                <h5 class="text-[9px] font-extrabold text-primary-light uppercase tracking-wider mb-2.5">Chương trình phát sóng</h5>
-                <div class="space-y-2">
-            `;
-
-            upcomingPrograms.forEach(p => {
-                const startStr = new Date(p.start).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
-                const endStr = new Date(p.stop).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
-                const isCurrent = activeProg && p.start === activeProg.start;
-
-                let progressHtml = '';
-                if (isCurrent) {
-                    const totalDur = p.stop - p.start;
-                    const elapsed = now - p.start;
-                    const pct = Math.max(0, Math.min(100, (elapsed / totalDur) * 100));
-                    progressHtml = `
-                        <div class="w-full bg-borderInput/30 rounded-full h-1 mt-1.5 overflow-hidden">
-                            <div class="bg-primary h-full transition-all duration-500" style="width: ${pct}%"></div>
-                        </div>
-                    `;
-                }
-
-                html += `
-                    <div class="p-2.5 rounded-xl flex flex-col transition ${isCurrent ? 'bg-primary/10 border border-primary/30 shadow-sm' : 'bg-variant/30 border border-transparent hover:bg-variant/50'}">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-extrabold ${isCurrent ? 'text-primary' : 'text-primary-light'}">${startStr} - ${endStr}</span>
-                            ${isCurrent ? '<span class="text-[8px] bg-primary text-white font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider scale-90">Đang chiếu</span>' : ''}
-                        </div>
-                        <h4 class="text-xs font-bold mt-1 ${isCurrent ? 'text-main' : 'text-main/95'}">${p.title}</h4>
-                        ${p.desc ? `<p class="text-[10px] text-muted mt-1 leading-relaxed line-clamp-2">${p.desc}</p>` : ''}
-                        ${progressHtml}
-                    </div>
-                `;
-            });
-
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        // --- 12. TƯƠNG TÁC THAO TÁC TRÊN PLAYER SLOTS (DBLCLICK SEEK & VOD) ---
         function setupPlaybackInteractions(slotIndex) {
             const video = document.getElementById(`videoPlayer${slotIndex}`);
             const container = document.getElementById(`mvSlot${slotIndex}`);
@@ -2239,7 +2416,6 @@
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
 
-        // Lắng nghe phím tắt điều khiển
         document.addEventListener('keydown', function(e) {
             if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
             if (e.key === 'ArrowLeft') {
@@ -2256,7 +2432,6 @@
             }
         });
 
-        // --- 13. QUẢN LÝ BỐ CỤC ĐA MÀN HÌNH ---
         function stopSlotPlayback(index) {
             const video = document.getElementById(`videoPlayer${index}`);
             if (video) {
@@ -2270,7 +2445,11 @@
                 }
             }
             if (players[index]) {
-                try { players[index].destroy(); } catch (e) {}
+                try { 
+                    if (players[index].destroy) {
+                        players[index].destroy(); 
+                    }
+                } catch (e) {}
                 players[index] = null;
             }
             currentActiveChannels[index] = null;
@@ -2282,7 +2461,6 @@
             const container2 = document.getElementById("subMvContainer_2");
             const container4 = document.getElementById("subMvContainer_4");
             
-            // Highlight buttons
             const btn1 = document.getElementById("primaryMvBtn_1");
             const btn2 = document.getElementById("primaryMvBtn_2");
             const btn4 = document.getElementById("primaryMvBtn_4");
@@ -2506,12 +2684,9 @@
             updateCurrentEpgDisplay();
         }
 
-        // --- 14. KHỞI CHẠY HỆ THỐNG ĐỒNG BỘ (WINDOW ONLOAD) ---
         window.onload = async function() {
             try {
-                // Khởi tạo IndexedDB trước
                 await initDB();
-                // Nạp playlists và EPG an toàn
                 await loadPlaylistsFromDB();
                 await loadEpgCacheFromDB();
                 
@@ -2540,7 +2715,6 @@
                     }
                 });
 
-                // Kiểm tra thay đổi lịch trình định kỳ mỗi 60 giây
                 setInterval(updateEpgUIAndProgress, 60000);
             } catch (err) {
                 console.error("Lỗi khởi tạo hệ thống:", err);
