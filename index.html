@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Hub Pro</title>
+    <title>VNTV</title>
     <link class="js-favicon" rel="icon" type="image/png" href="tv.png">
     
     <!-- Tailwind CSS -->
@@ -271,15 +271,15 @@
                 </div>
                 <div class="min-w-0">
                     <h1 class="text-sm font-extrabold tracking-tight text-main flex items-center gap-1.5">
-                        IPTV Hub 
+                        VNTV
                         <span class="text-[9px] bg-primary/20 text-primary-light px-2.5 py-0.5 rounded-full font-extrabold tracking-widest flex items-center gap-1.5">
-                            ULTIMATE PRO
+                        v2.8PRO
                         </span>
                         <button onclick="toggleAboutModal(true)" class="text-muted hover:text-primary transition p-0.5" title="Thông tin & Bản quyền">
                             <i class="fa-solid fa-circle-info text-xs"></i>
                         </button>
                     </h1>
-                    <p class="text-[10px] text-muted truncate">Thiết kế ColorOS Glow & Trình phát đa phương tiện thế hệ mới</p>
+                    <p class="text-[10px] text-muted truncate">IPTV PLAYER</p>
                 </div>
             </div>
             
@@ -329,7 +329,7 @@
             <div class="p-3.5 space-y-3 border-b border-borderColor bg-transparent shrink-0">
                 <!-- Dropdown selector -->
                 <div class="bg-variant rounded-xl p-2 border border-borderInput">
-                    <label class="block text-[8px] text-muted font-extrabold mb-0.5 px-1 uppercase tracking-wider">Danh Sách IPTV</label>
+                    <label class="block text-[8px] text-muted font-extrabold mb-0.5 px-1 uppercase tracking-wider">Danh sách phát ( ĐANG CHỌN )</label>
                     <div class="flex items-center gap-2">
                         <select id="playlistSelect" onchange="onPlaylistChange()" class="flex-1 bg-transparent text-main text-xs font-bold focus:outline-none cursor-pointer truncate">
                             <option value="">-- Chưa có danh sách --</option>
@@ -357,7 +357,7 @@
                 <div class="flex gap-1.5">
                     <div class="flex-1 bg-variant rounded-full px-3 py-1.5 border border-borderInput flex items-center">
                         <select id="groupSelect" onchange="filterChannels()" class="w-full bg-transparent text-main text-[10px] font-bold focus:outline-none cursor-pointer">
-                            <option value="all">Tất cả các nhóm</option>
+                            <option value="all">Tất cả các nhóm kênh</option>
                         </select>
                     </div>
                     <button onclick="toggleFavoritesOnly()" id="favToggleBtn" class="bg-variant hover:bg-variantHover text-muted p-2 rounded-full text-xs transition flex items-center justify-center border border-borderInput w-8 h-8 shrink-0" title="Chỉ xem yêu thích">
@@ -476,7 +476,7 @@
                         <i class="fa-solid fa-clapperboard text-lg animate-pulse"></i>
                     </div>
                     <h3 class="text-xs font-extrabold text-white">Chưa Chọn Kênh Phát</h3>
-                    <p class="text-[10px] text-muted max-w-xs mt-1 leading-relaxed">Chọn kênh bất kỳ ở dưới để bắt đầu trình phát. <br>Hỗ trợ tuyệt vời các luồng HLS (.m3u8), DASH (.mpd) & kênh bảo mật DRM Widevine/ClearKey.</p>
+                    <p class="text-[10px] text-muted max-w-xs mt-1 leading-relaxed">Chọn kênh bất kỳ ở danh sách kênh để bắt đầu trình phát.
                 </div>
 
                 <!-- Custom Overlay Playbar controls -->
@@ -540,27 +540,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- EPG current bar (Hidden on mobile) -->
-            <div id="epgCurrentBar" class="hidden md:flex bg-variant border-t border-borderColor px-4 py-2 text-xs flex items-center justify-between gap-4 shrink-0">
-                <div class="flex items-center gap-2 min-w-0">
-                    <span class="bg-primary text-white font-extrabold px-1.5 py-0.5 rounded text-[8px]">ĐANG CHIẾU</span>
-                    <span id="epgCurrentTitle" class="text-main font-bold truncate">Đang tải lịch phát sóng...</span>
-                </div>
-                <div class="flex items-center gap-3 shrink-0">
-                    <span id="epgCurrentTime" class="text-muted font-semibold">00:00 - 00:00</span>
-                </div>
-            </div>
-
-            <!-- Footer control bar and info (Hidden on mobile) -->
-            <div id="controlBarInfo" class="hidden md:flex bg-surface border-t border-borderColor p-3 shrink-0 flex-col lg:flex-row lg:items-center lg:justify-between gap-3 z-10">
-                <div class="flex items-center gap-3 min-w-0">
-                    <img id="currentLogo" src="https://placehold.co/80x80/252529/d0bcff?text=TV" onerror="this.src='https://placehold.co/80x80/252529/d0bcff?text=TV'" class="w-10 h-10 rounded-xl object-contain bg-variant border border-borderInput p-1 shrink-0" alt="Logo">
-                    <div class="min-w-0">
-                        <h2 id="currentTitle" class="font-bold text-main text-sm truncate">Chưa chọn kênh phát</h2>
-                        <p id="currentGroup" class="text-[10px] text-muted mt-0.5">Chọn một kênh bên trái để bắt đầu</p>
-                    </div>
-                </div>
+            
                 
                 <div class="flex flex-wrap items-center gap-1.5">
                     <!-- REMOVED BUTTON WATCH TIMELINE AS REQUESTED -->
@@ -604,7 +584,7 @@
         <div class="bg-dialogBg border border-borderColor rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div class="px-5 py-4 border-b border-borderColor/50 flex items-center justify-between bg-variant/20">
                 <h3 class="text-xs font-extrabold text-main tracking-wider uppercase flex items-center gap-1.5">
-                    <i class="fa-solid fa-sliders text-primary"></i> Cài Đặt Hệ Thống
+                    <i class="fa-solid fa-sliders text-primary"></i> Thêm nguồn, thay đổi màu sắc.
                 </h3>
                 <button onclick="toggleSettingsModal(false)" class="text-muted hover:text-main transition w-7 h-7 rounded-full hover:bg-variant flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-sm"></i>
@@ -617,15 +597,15 @@
                     <h4 class="text-[10px] font-extrabold text-primary uppercase tracking-wider">Giao Diện & Màu Sắc</h4>
                     <div class="grid grid-cols-2 gap-2">
                         <button onclick="applyUiTheme('dark')" class="p-2.5 bg-variant hover:bg-variantHover rounded-xl border border-borderInput text-xs font-bold text-main flex flex-col items-center gap-1 transition">
-                            <i class="fa-solid fa-moon text-sm"></i> Nền Tối (ColorOS Dark)
+                            <i class="fa-solid fa-moon text-sm"></i> Nền Tối (Dark)
                         </button>
                         <button onclick="applyUiTheme('light')" class="p-2.5 bg-variant hover:bg-variantHover rounded-xl border border-borderInput text-xs font-bold text-main flex flex-col items-center gap-1 transition">
-                            <i class="fa-solid fa-sun text-sm"></i> Nền Sáng (ColorOS Light)
+                            <i class="fa-solid fa-sun text-sm"></i> Nền Sáng (Light)
                         </button>
                     </div>
                     
                     <div class="space-y-1 pt-1.5">
-                        <label class="block text-[9px] text-muted font-extrabold uppercase tracking-widest px-1">Mẫu màu thiết kế (ColorOS Glow)</label>
+                        <label class="block text-[9px] text-muted font-extrabold uppercase tracking-widest px-1">Mẫu màu thiết kế (Glow)</label>
                         <div class="grid grid-cols-2 gap-2 mt-1.5">
                             <button onclick="applyColorTheme('purple')" class="p-2 bg-variant hover:bg-variantHover rounded-xl border border-borderInput flex items-center gap-2 transition text-left">
                                 <span class="w-3.5 h-3.5 rounded-full bg-[#875cff] shrink-0"></span>
@@ -666,7 +646,7 @@
                                 <span class="w-3.5 h-3.5 rounded-full bg-[#00f2fe] shrink-0 shadow-[0_0_8px_rgba(0,242,254,0.4)]"></span>
                                 <div class="min-w-0">
                                     <span class="text-[10px] font-bold block truncate text-main">Aura Glow</span>
-                                    <span class="text-[8px] text-muted block truncate">ColorOS</span>
+                                    <span class="text-[8px] text-muted block truncate">Mát mẻ</span>
                                 </div>
                             </button>
                         </div>
@@ -805,7 +785,7 @@
             <div class="p-5 space-y-4 text-xs leading-relaxed text-muted">
                 <div class="space-y-1">
                     <h4 class="font-extrabold text-main text-sm flex items-center gap-1.5">
-                        IPTV Hub <span class="text-[9px] bg-primary/20 text-primary-light px-2 py-0.5 rounded font-extrabold">v2.8 PRO</span>
+                        VNTV <span class="text-[9px] bg-primary/20 text-primary-light px-2 py-0.5 rounded font-extrabold">v2.8 PRO</span>
                     </h4>
                     <p>Hệ thống trình phát IPTV cá nhân siêu nhẹ, được phát triển trên phong cách glassmorphism tối giản và tập trung cao vào hiệu năng xử lý danh sách kênh lớn.</p>
                 </div>
@@ -818,8 +798,8 @@
                 </div>
 
                 <div class="border-t border-borderColor/50 pt-3 flex justify-between items-center text-[10px] text-muted">
-                    <span>Phát triển: <strong class="text-main">Trung & Gemini</strong></span>
-                    <span class="text-primary-light font-extrabold">IPTV Hub Team © 2026</span>
+                    <span>Phát triển: <strong class="text-main">Gemini</strong></span>
+                    <span class="text-primary-light font-extrabold">VNTV ©2026</span>
                 </div>
             </div>
 
@@ -851,7 +831,7 @@
 
     <!-- KHỐI MÃ JAVASCRIPT HỢP NHẤT TOÀN DIỆN -->
     <script>
-        const DB_NAME = "IPTV_Hub_DB_V2";
+        const DB_NAME = "VNTV";
         const DB_VERSION = 2;
         let db = null; 
         let isLocalStorageFallback = false; 
