@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPTV Hub Pro</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,12 +23,25 @@
             }
         }
     </script>
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- HLS.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        /* Custom Scrollbar for Horizontal Categories */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -40,188 +53,212 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans h-screen flex flex-col overflow-hidden">
 
-    <!-- HEADER / NAVIGATION -->
-    <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+    <!-- HEADER -->
+    <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0 z-10">
         <div class="flex items-center space-x-3">
-            <i class="fa-solid font-bold text-xl text-blue-500 fa-tv"></i>
+            <i class="fa-solid fa-tv text-xl text-blue-500"></i>
             <span class="font-bold text-lg tracking-wide bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">IPTV HUB PRO</span>
+            <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold border border-blue-500/30">ULTIMATE</span>
         </div>
         
         <div class="flex items-center space-x-2">
-            <!-- Playlist Input Modal Trigger -->
-            <button onclick="openModal('playlistModal')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <!-- Multiview Selector -->
+            <div class="hidden md:flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700/50 mr-2">
+                <button onclick="setMultiView(1)" class="px-2.5 py-1 text-xs font-medium rounded hover:bg-slate-700 transition active-layout" id="btn-layout-1">1 Màn</button>
+                <button onclick="setMultiView(2)" class="px-2.5 py-1 text-xs font-medium rounded hover:bg-slate-700 transition" id="btn-layout-2">2 Màn</button>
+                <button onclick="setMultiView(4)" class="px-2.5 py-1 text-xs font-medium rounded hover:bg-slate-700 transition" id="btn-layout-4">4 Màn</button>
+            </div>
+
+            <!-- Add Playlist -->
+            <button onclick="openModal('playlistModal')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5">
                 <i class="fa-solid fa-plus"></i>
                 <span class="hidden sm:inline">Thêm Playlist</span>
             </button>
             
-            <!-- Quick Dark/Light Toggle -->
+            <!-- Dark/Light Toggle -->
             <button onclick="toggleTheme()" class="p-2 text-slate-400 hover:text-slate-100 rounded-lg hover:bg-slate-800 transition">
-                <i class="fa-solid fa-moon text-lg" id="themeIcon"></i>
+                <i class="fa-solid fa-moon text-base" id="themeIcon"></i>
             </button>
         </div>
     </header>
 
-    <!-- MAIN CONTAINER -->
+    <!-- MAIN BODY -->
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
-        <!-- LEFT/MAIN COLUMN: PLAYER & HORIZONTAL CATEGORIES -->
-        <main class="flex-1 flex flex-col bg-slate-950 overflow-y-auto">
+        <!-- SIDEBAR: TABS (CHANNELS / EPG) -->
+        <aside class="w-full md:w-80 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col h-1/2 md:h-auto shrink-0 order-2 md:order-1">
             
-            <!-- VIDEO PLAYER CONTAINER -->
-            <div id="multiViewContainer" class="w-full bg-black relative aspect-video max-h-[45vh] md:max-h-[60vh] flex items-center justify-center border-b border-slate-800">
-                <video id="mainPlayer" class="w-full h-full object-contain" controls autoplay></video>
-                <div id="playerPlaceholder" class="absolute flex flex-col items-center justify-center text-slate-500">
-                    <i class="fa-solid fa-play-circle text-5xl mb-2 opacity-50"></i>
-                    <p class="text-sm">Chọn một kênh để bắt đầu xem</p>
+            <!-- Tab Headers -->
+            <div class="flex border-b border-slate-800 bg-slate-950/50">
+                <button id="tab-channels-btn" onclick="switchTab('channels')" class="flex-1 py-3 px-4 text-sm font-semibold text-blue-400 border-b-2 border-blue-500 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-list-ul text-base"></i>
+                    <span>Danh sách kênh</span>
+                    <span id="channel-badge" class="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button id="tab-epg-btn" onclick="switchTab('epg')" class="flex-1 py-3 px-4 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-calendar-days text-base"></i>
+                    <span>Lịch phát sóng</span>
+                </button>
+            </div>
+
+            <!-- Tab Content: Channels -->
+            <div id="tab-channels" class="flex-1 flex flex-col overflow-hidden">
+                <div class="p-2.5 border-b border-slate-800 bg-slate-900/80">
+                    <input type="text" id="searchInput" oninput="filterChannels()" placeholder="Tìm kiếm kênh..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+                </div>
+                <div id="channelList" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1.5">
+                    <div class="text-center py-10 text-slate-500 text-sm">
+                        <i class="fa-solid fa-folder-open text-3xl mb-2 opacity-40"></i>
+                        <p>Chưa có danh sách kênh</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- HORIZONTAL CATEGORY SCROLLBAR (NHÓM KÊNH CUỘN NGANG) -->
-            <div class="bg-slate-900 border-b border-slate-800 p-2.5 shrink-0">
-                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 px-1 flex items-center justify-between">
-                    <span><i class="fa-solid fa-layer-group mr-1.5 text-blue-400"></i>Nhóm kênh</span>
-                    <span id="categoryCount" class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">0 Nhóm</span>
+            <!-- Tab Content: EPG -->
+            <div id="tab-epg" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3 hidden">
+                <div id="epgContainer" class="text-sm text-slate-400 space-y-2">
+                    <div class="text-center py-10 text-slate-500">
+                        <i class="fa-solid fa-clock-rotate-left text-3xl mb-2 opacity-40"></i>
+                        <p>Chọn một kênh để xem lịch chiếu</p>
+                    </div>
                 </div>
-                <div id="categoryContainer" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 scroll-smooth">
-                    <!-- Default All Button -->
-                    <button onclick="filterGroup('ALL')" class="cat-btn active bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition shrink-0 shadow-sm">
+            </div>
+
+        </aside>
+
+        <!-- MAIN DISPLAY / PLAYER AREA -->
+        <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden order-1 md:order-2">
+            
+            <!-- Video Container / Multiview Grid -->
+            <div id="multiViewContainer" class="flex-1 bg-black relative grid grid-cols-1 gap-1 p-1 overflow-hidden">
+                <div id="player-slot-1" class="relative w-full h-full bg-slate-950 flex items-center justify-center overflow-hidden rounded">
+                    <video id="mainPlayer" class="w-full h-full object-contain" controls autoplay></video>
+                    <div id="playerPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-600 bg-slate-950">
+                        <i class="fa-solid fa-circle-play text-5xl mb-2 opacity-40"></i>
+                        <p class="text-sm">Sẵn sàng phát sóng</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HORIZONTAL CATEGORIES BAR (THAY CHO THANH THÔNG TIN CŨ) -->
+            <div class="h-12 bg-slate-900 border-t border-slate-800 px-3 flex items-center shrink-0">
+                <div id="groupScrollContainer" class="flex items-center space-x-2 overflow-x-auto no-scrollbar w-full py-1">
+                    <button onclick="selectGroup('ALL')" class="group-btn active bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition shrink-0 shadow">
                         Tất cả kênh
                     </button>
-                    <span class="text-xs text-slate-600 shrink-0">Chưa có dữ liệu playlist...</span>
+                    <span class="text-xs text-slate-500 italic shrink-0">Chưa nạp playlist</span>
                 </div>
-            </div>
-
-            <!-- CHANNEL GRID / LIST AREA (MOBILE BELOW / DESKTOP INTEGRATED) -->
-            <div class="flex-1 p-3 overflow-y-auto">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                        <i class="fa-solid fa-list-ul text-blue-500"></i>
-                        <span id="currentGroupTitle">Tất cả kênh</span>
-                    </h2>
-                    <span id="channelCount" class="text-xs text-slate-500">0 kênh</span>
-                </div>
-
-                <!-- Channels Grid -->
-                <div id="channelGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
-                    <!-- Dynamic Channel Cards will be rendered here -->
-                </div>
+                <button onclick="toggleFullscreen()" class="ml-2 text-slate-400 hover:text-white transition p-1.5 shrink-0" title="Toàn màn hình">
+                    <i class="fa-solid fa-expand text-base"></i>
+                </button>
             </div>
 
         </main>
 
-        <!-- SIDEBAR: EPG / TAB BẢNG LỊCH PHÁT SÓNG -->
-        <aside class="w-full md:w-80 bg-slate-900 border-t md:border-t-0 md:border-l border-slate-800 flex flex-col h-64 md:h-auto shrink-0">
-            <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-calendar-day text-blue-400"></i>
-                    <h3 class="font-semibold text-sm text-slate-200">Lịch phát sóng (EPG)</h3>
-                </div>
-            </div>
-
-            <div id="epgContainer" class="flex-1 p-3 overflow-y-auto space-y-2 text-sm">
-                <div class="text-center py-8 text-slate-500">
-                    <i class="fa-solid fa-clock-rotate-left text-3xl mb-2 opacity-40"></i>
-                    <p class="text-xs">Chọn kênh để xem lịch chiếu chi tiết</p>
-                </div>
-            </div>
-        </aside>
-
     </div>
 
-    <!-- MODAL: ADD PLAYLIST -->
+    <!-- MODAL: PLAYLIST -->
     <div id="playlistModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-link text-blue-500"></i> Thêm Danh Sách Kênh (M3U)
+                <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-blue-500"></i> Nạp Danh Sách M3U
                 </h3>
                 <button onclick="closeModal('playlistModal')" class="text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Đường dẫn URL M3U / M3U8</label>
-                    <input type="url" id="playlistUrl" placeholder="https://example.com/playlist.m3u" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500">
+                    <label class="block font-medium text-slate-400 mb-1">Nhập URL Playlist (.m3u / .m3u8)</label>
+                    <input type="url" id="playlistUrl" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-blue-500">
                 </div>
-                <div class="text-center text-xs text-slate-500">Hoặc tải file từ máy tính</div>
+                <div class="text-center text-slate-500 py-1">- HOẶC -</div>
                 <div>
-                    <input type="file" id="playlistFile" accept=".m3u,.m3u8" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-300 hover:file:bg-slate-700">
+                    <label class="block font-medium text-slate-400 mb-1">Tải file từ thiết bị</label>
+                    <input type="file" id="playlistFile" accept=".m3u,.m3u8" class="w-full text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-300 hover:file:bg-slate-700 cursor-pointer">
                 </div>
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
                 <button onclick="closeModal('playlistModal')" class="px-4 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700">Hủy</button>
-                <button onclick="loadPlaylist()" class="px-4 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-500">Tải Danh Sách</button>
+                <button onclick="loadPlaylist()" class="px-4 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-500">Nạp Danh Sách</button>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT APP LOGIC -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         let rawChannels = [];
-        let filteredChannels = [];
-        let groups = [];
+        let currentSelectedGroup = 'ALL';
         let hlsPlayer = null;
-        let isLocalStorageFallback = false;
 
-        // Smart Dual-Storage Fallback Check
-        function initDB() {
-            try {
-                const test = 'db_test';
-                localStorage.setItem(test, test);
-                localStorage.removeItem(test);
-            } catch (e) {
-                isLocalStorageFallback = true;
-            }
-        }
-        initDB();
-
-        // UI Helpers
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 
         function toggleTheme() {
             document.documentElement.classList.toggle('dark');
             const icon = document.getElementById('themeIcon');
-            if (document.documentElement.classList.contains('dark')) {
-                icon.className = 'fa-solid fa-moon text-lg';
+            icon.className = document.documentElement.classList.contains('dark') ? 'fa-solid fa-moon text-base' : 'fa-solid fa-sun text-base text-yellow-500';
+        }
+
+        function switchTab(tab) {
+            const chanTab = document.getElementById('tab-channels');
+            const epgTab = document.getElementById('tab-epg');
+            const chanBtn = document.getElementById('tab-channels-btn');
+            const epgBtn = document.getElementById('tab-epg-btn');
+
+            if (tab === 'channels') {
+                chanTab.classList.remove('hidden');
+                epgTab.classList.add('hidden');
+                chanBtn.className = "flex-1 py-3 px-4 text-sm font-semibold text-blue-400 border-b-2 border-blue-500 transition flex items-center justify-center gap-2";
+                epgBtn.className = "flex-1 py-3 px-4 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition flex items-center justify-center gap-2";
             } else {
-                icon.className = 'fa-solid fa-sun text-lg text-yellow-500';
+                chanTab.classList.add('hidden');
+                epgTab.classList.remove('hidden');
+                epgBtn.className = "flex-1 py-3 px-4 text-sm font-semibold text-blue-400 border-b-2 border-blue-500 transition flex items-center justify-center gap-2";
+                chanBtn.className = "flex-1 py-3 px-4 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition flex items-center justify-center gap-2";
             }
         }
 
-        // Parse M3U
+        function setMultiView(count) {
+            const container = document.getElementById('multiViewContainer');
+            if (count === 1) {
+                container.className = "flex-1 bg-black relative grid grid-cols-1 gap-1 p-1 overflow-hidden";
+            } else if (count === 2) {
+                container.className = "flex-1 bg-black relative grid grid-cols-1 md:grid-cols-2 gap-1 p-1 overflow-hidden";
+            } else if (count === 4) {
+                container.className = "flex-1 bg-black relative grid grid-cols-2 grid-rows-2 gap-1 p-1 overflow-hidden";
+            }
+        }
+
         function parseM3U(content) {
             const lines = content.split('\n');
             const channels = [];
-            let currentChannel = {};
+            let current = {};
 
             for (let line of lines) {
                 line = line.trim();
                 if (line.startsWith('#EXTINF:')) {
                     const nameMatch = line.match(/,(.+)$/);
-                    const groupMatch = line.match(/group-title="([^"]+)"/i);
                     const logoMatch = line.match(/tvg-logo="([^"]+)"/i);
+                    const groupMatch = line.match(/group-title="([^"]+)"/i);
 
-                    currentChannel = {
+                    current = {
                         name: nameMatch ? nameMatch[1].trim() : 'Kênh không tên',
-                        group: groupMatch ? groupMatch[1].trim() : 'Khác',
-                        logo: logoMatch ? logoMatch[1].trim() : ''
+                        logo: logoMatch ? logoMatch[1].trim() : '',
+                        group: groupMatch ? groupMatch[1].trim() : 'Khác'
                     };
                 } else if (line.length > 0 && !line.startsWith('#')) {
-                    currentChannel.url = line;
-                    if (currentChannel.name) {
-                        channels.push({ ...currentChannel });
-                    }
-                    currentChannel = {};
+                    current.url = line;
+                    if (current.name) channels.push({ ...current });
+                    current = {};
                 }
             }
             return channels;
         }
 
-        // Load Playlist Handler
         function loadPlaylist() {
             const url = document.getElementById('playlistUrl').value.trim();
             const fileInput = document.getElementById('playlistFile');
@@ -229,7 +266,7 @@
             if (fileInput.files.length > 0) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    processPlaylistData(e.target.result);
+                    processM3U(e.target.result);
                 };
                 reader.readAsText(fileInput.files[0]);
                 closeModal('playlistModal');
@@ -237,45 +274,36 @@
                 fetch(url)
                     .then(res => res.text())
                     .then(data => {
-                        processPlaylistData(data);
+                        processM3U(data);
                         closeModal('playlistModal');
                     })
-                    .catch(() => alert('Không thể tải file từ URL này (Lỗi CORS hoặc link hỏng)'));
-            } else {
-                alert('Vui lòng dán link hoặc chọn file M3U');
+                    .catch(() => alert('Không thể nạp link M3U này!'));
             }
         }
 
-        function processPlaylistData(m3uText) {
-            rawChannels = parseM3U(m3uText);
-            if (rawChannels.length === 0) {
-                alert('Không tìm thấy danh sách kênh hợp lệ trong file M3U!');
-                return;
-            }
+        function processM3U(data) {
+            rawChannels = parseM3U(data);
+            document.getElementById('channel-badge').innerText = rawChannels.length;
+            renderGroups();
+            filterChannels();
+        }
 
-            // Extract Groups
+        function renderGroups() {
+            const container = document.getElementById('groupScrollContainer');
             const groupSet = new Set(rawChannels.map(c => c.group));
-            groups = Array.from(groupSet);
-
-            renderCategoryBar();
-            filterGroup('ALL');
-        }
-
-        // Render Horizontal Category Buttons
-        function renderCategoryBar() {
-            const container = document.getElementById('categoryContainer');
-            document.getElementById('categoryCount').innerText = `${groups.length} Nhóm`;
+            const groups = Array.from(groupSet);
 
             let html = `
-                <button onclick="filterGroup('ALL')" class="cat-btn active bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition shrink-0 shadow-sm">
+                <button onclick="selectGroup('ALL')" class="group-btn ${currentSelectedGroup === 'ALL' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition shrink-0">
                     Tất cả kênh
                 </button>
             `;
 
-            groups.forEach(group => {
+            groups.forEach(g => {
+                const isSelected = currentSelectedGroup === g;
                 html += `
-                    <button onclick="filterGroup('${group.replace(/'/g, "\\'")}')" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition shrink-0">
-                        ${group}
+                    <button onclick="selectGroup('${g.replace(/'/g, "\\'")}')" class="group-btn ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition shrink-0">
+                        ${g}
                     </button>
                 `;
             });
@@ -283,55 +311,49 @@
             container.innerHTML = html;
         }
 
-        // Filter Channels by Group
-        function filterGroup(groupName) {
-            // Update Active Style for Category Buttons
-            const buttons = document.querySelectorAll('.cat-btn');
-            buttons.forEach(btn => {
-                if (btn.innerText.trim() === (groupName === 'ALL' ? 'Tất cả kênh' : groupName)) {
-                    btn.className = 'cat-btn active bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition shrink-0 shadow-sm';
-                } else {
-                    btn.className = 'cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition shrink-0';
-                }
-            });
-
-            if (groupName === 'ALL') {
-                filteredChannels = rawChannels;
-                document.getElementById('currentGroupTitle').innerText = 'Tất cả kênh';
-            } else {
-                filteredChannels = rawChannels.filter(c => c.group === groupName);
-                document.getElementById('currentGroupTitle').innerText = groupName;
-            }
-
-            renderChannels();
+        function selectGroup(groupName) {
+            currentSelectedGroup = groupName;
+            renderGroups();
+            filterChannels();
         }
 
-        // Render Channel Grid
-        function renderChannels() {
-            const grid = document.getElementById('channelGrid');
-            document.getElementById('channelCount').innerText = `${filteredChannels.length} kênh`;
-
-            if (filteredChannels.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-6 text-sm">Không có kênh nào trong nhóm này</div>';
+        function renderChannelList(list) {
+            const container = document.getElementById('channelList');
+            if (list.length === 0) {
+                container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">Không tìm thấy kênh</div>';
                 return;
             }
 
-            grid.innerHTML = filteredChannels.map((ch, idx) => `
-                <div onclick="playChannel('${ch.url.replace(/'/g, "\\'")}', '${ch.name.replace(/'/g, "\\'")}')" 
-                     class="bg-slate-900 hover:bg-slate-800 border border-slate-800/80 hover:border-blue-500/50 p-2.5 rounded-xl cursor-pointer transition flex items-center space-x-3 group shadow-sm">
-                    <div class="w-10 h-10 bg-slate-950 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-slate-800">
-                        ${ch.logo ? `<img src="${ch.logo}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<i class=\'fa-solid fa-tv text-slate-600 text-xs\'></i>';">` : `<i class="fa-solid fa-tv text-slate-600 text-xs"></i>`}
+            container.innerHTML = list.map(ch => `
+                <div onclick="playStream('${ch.url.replace(/'/g, "\\'")}', '${ch.name.replace(/'/g, "\\'")}')" 
+                     class="p-2.5 hover:bg-slate-800/90 rounded-xl cursor-pointer transition flex items-center space-x-3.5 group border border-transparent hover:border-slate-700">
+                    <div class="w-10 h-10 bg-slate-950 rounded-lg flex items-center justify-center shrink-0 border border-slate-800 shadow-sm overflow-hidden">
+                        ${ch.logo ? `<img src="${ch.logo}" class="w-full h-full object-contain p-0.5" onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<i class=\'fa-solid fa-tv text-slate-500 text-sm\'></i>';">` : `<i class="fa-solid fa-tv text-slate-500 text-sm"></i>`}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-xs font-medium text-slate-200 group-hover:text-blue-400 truncate">${ch.name}</div>
-                        <div class="text-[10px] text-slate-500 truncate">${ch.group}</div>
+                        <div class="text-sm font-semibold text-slate-100 group-hover:text-blue-400 truncate leading-snug">${ch.name}</div>
+                        <div class="text-xs text-slate-400 truncate mt-0.5">${ch.group}</div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Play Channel
-        function playChannel(url, name) {
+        function filterChannels() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = rawChannels;
+
+            if (currentSelectedGroup !== 'ALL') {
+                filtered = filtered.filter(c => c.group === currentSelectedGroup);
+            }
+
+            if (query) {
+                filtered = filtered.filter(c => c.name.toLowerCase().includes(query) || c.group.toLowerCase().includes(query));
+            }
+
+            renderChannelList(filtered);
+        }
+
+        function playStream(url, name) {
             const video = document.getElementById('mainPlayer');
             const placeholder = document.getElementById('playerPlaceholder');
 
@@ -342,46 +364,36 @@
                 hlsPlayer = new Hls();
                 hlsPlayer.loadSource(url);
                 hlsPlayer.attachMedia(video);
-                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play();
-                });
+                hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => video.play());
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play();
-                });
-            } else {
-                alert('Trình duyệt của bạn không hỗ trợ định dạng video phát sóng này.');
+                video.addEventListener('loadedmetadata', () => video.play());
             }
 
-            renderEPG(name);
+            updateEPG(name);
         }
 
-        // Simulated EPG Data
-        function renderEPG(channelName) {
+        function updateEPG(name) {
             const container = document.getElementById('epgContainer');
             container.innerHTML = `
-                <div class="bg-slate-950 border border-slate-800 rounded-lg p-3 space-y-2">
-                    <div class="text-xs font-semibold text-blue-400 border-b border-slate-800 pb-1">${channelName}</div>
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+                    <div class="text-sm font-bold text-blue-400 border-b border-slate-800 pb-1.5">${name}</div>
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-slate-300 font-medium">Chương trình hiện tại</span>
-                        <span class="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded uppercase font-bold">Trực tiếp</span>
+                        <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-bold">LIVE</span>
                     </div>
-                    <div class="text-xs text-slate-400">Thời sự / Giải trí tổng hợp</div>
-                    <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                        <div class="bg-blue-500 h-full w-2/3"></div>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-500 pt-2 font-medium">Chương trình tiếp theo:</div>
-                <div class="bg-slate-950/50 border border-slate-800/60 rounded-lg p-2.5 text-xs text-slate-400 flex justify-between">
-                    <span>19:00 - Bản tin Thời sự</span>
-                    <span class="text-slate-600">Sắp chiếu</span>
-                </div>
-                <div class="bg-slate-950/50 border border-slate-800/60 rounded-lg p-2.5 text-xs text-slate-400 flex justify-between">
-                    <span>20:00 - Phim truyện đặc sắc</span>
-                    <span class="text-slate-600">Sắp chiếu</span>
+                    <div class="text-xs text-slate-400">Luồng phát trực tiếp HD</div>
                 </div>
             `;
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('multiViewContainer');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => alert(err.message));
+            } else {
+                document.exitFullscreen();
+            }
         }
     </script>
 </body>
